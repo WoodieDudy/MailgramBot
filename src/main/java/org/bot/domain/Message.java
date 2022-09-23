@@ -1,4 +1,4 @@
-package org.example;
+package org.bot.domain;
 
 
 public class Message {

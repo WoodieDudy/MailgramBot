@@ -1,4 +1,7 @@
-package org.example;
+package org.bot.application;
+
+import org.bot.domain.Message;
+import org.bot.domain.MessagesTemplates;
 
 public class BotLogic {
     public Message getStartMessage() {

@@ -1,4 +1,4 @@
-package org.example;
+package org.bot.domain;
 
 public class MessagesTemplates {
     public static final String START_MESSAGE = "Привет! Я Mailgram bot, я помогу тебе удобно пользоваться почтой без мобильного клиента посредством Telegram. Чтобы узнать, что я умею, напиши /help.";

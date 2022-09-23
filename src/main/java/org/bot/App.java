@@ -1,6 +1,11 @@
-package org.example;
+package org.bot;
 
-public class App 
+import org.bot.application.Bot;
+import org.bot.application.BotInterface;
+import org.bot.application.BotLogic;
+import org.bot.infrastructure.ConsoleBotInterface;
+
+public class App
 {
     public static void main( String[] args )
     {

@@ -1,4 +1,4 @@
-package org.example;
+package org.bot.domain;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

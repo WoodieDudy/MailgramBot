@@ -1,4 +1,6 @@
-package org.example;
+package org.bot.application;
+
+import org.bot.domain.Message;
 
 public final class Bot {
     private final BotInterface botInterface;
@@ -18,9 +20,6 @@ public final class Bot {
             Message message = botInterface.readMessage();
             Message response = botLogic.processMessage(message);
             botInterface.sendMessage(response);
-
-
         }
-
     }
 }
