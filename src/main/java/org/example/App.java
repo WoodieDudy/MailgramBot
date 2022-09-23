@@ -1,13 +1,12 @@
 package org.example;
 
-/**
- * Hello world!
- *
- */
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Hello World!" );
+        BotInterface botInterface = new ConsoleBotInterface();
+        BotLogic botLogic = new BotLogic();
+        Bot bot = new Bot(botInterface, botLogic);
+        bot.run();
     }
 }
