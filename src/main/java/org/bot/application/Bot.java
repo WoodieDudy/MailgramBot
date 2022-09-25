@@ -18,7 +18,7 @@ public final class Bot {
 
         while (true) {
             Message message = botInterface.readMessage();
-            Message response = botLogic.processMessage(message);
+            Message response = botLogic.processCommandsMessage(message);
             botInterface.sendMessage(response);
         }
     }
