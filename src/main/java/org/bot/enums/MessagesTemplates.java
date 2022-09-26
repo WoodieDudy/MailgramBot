@@ -12,11 +12,12 @@ public enum MessagesTemplates {
     DEFAULT_NOT_AUTH_MESSAGE("Я не понимаю тебя. Чтобы узнать, что я умею, напиши /help. Обрати внимание: " +
             "неавторизованные пользователи могут использовать только команды /help и /auth"),
 
-    AUTH_MESSAGE("Введи почту и пароль через пробел"),
+    WAITING_FOR_EMAIL("Введи почту"),
+    WAITING_FOR_PASSWORD("Введите пароль"),
     AUTH_SUCCESS_MESSAGE("Авторизация успешна"),
     AUTH_UNAVAILABLE_MESSAGE("Вы уже авторизованы"),
     AUTH_INCORRECT_MESSAGE("Ошибка ввода, необходимо ввести /auth [адрес_почты] [пароль]"),
-    AUTH_PASSWORD_ERROR_MESSAGE("Ошибка! Проверь корректность введённого пароля"),
+    AUTH_ERROR_MESSAGE("Ошибка! Проверь корректность введённого пароля и почты"),
 
     MAIL_ERROR_MESSAGE("Ошибка! Проверь корректность введённого адреса электронной почты"),
 
