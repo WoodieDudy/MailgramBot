@@ -5,13 +5,10 @@ import org.bot.domain.StateMachine;
 import org.bot.enums.MessagesTemplates;
 import org.bot.enums.UserState;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class BotLogic {
 
-    private StateMachine machine = new StateMachine();
+    private final StateMachine stateMachine = new StateMachine();
 
     public Message getStartMessage() { // Выдаёт стартовое сообщение.
         Message message = new Message(MessagesTemplates.START_MESSAGE.text);
@@ -19,54 +16,76 @@ public class BotLogic {
     }
 
     public Message createResponse(Message message) {
-        Integer currentUserID = message.userID;
-        UserState userState = machine.getUserState(currentUserID);
-        String currCommand = message.text.split(" ")[0];
+        Integer userID = message.userID;
+        String[] commands = message.text.split(" ");
+        UserState userState = stateMachine.getUserState(userID);
+
         switch (userState) { // проверяет текущее состоание пользователя, от которого зависит результат вызова команды
-            case AUTH -> {
-                switch (currCommand) {
-                    case "/auth":
-                        return new Message(MessagesTemplates.AUTH_UNAVAILABLE_MESSAGE.text);
-                    case "/help":
-                        return helpMessage();
-                    case "/send":
-                        machine.setUserState(currentUserID, UserState.SENDING);
-                        return new Message(MessagesTemplates.SENDING_TEXT_MESSAGE.text);
-                    case "/list":
-                        return listOfMessages();
-                    default:
-                        return new Message(MessagesTemplates.DEFAULT_MESSAGE.text);
-                }
-            }
-            case SENDING -> {
-                machine.setUserState(currentUserID, UserState.AUTH);
-                return sendingFunctional();
-            }
-            case NOT_AUTH -> {
-                switch (currCommand) {
-                    case "/help":
-                        return helpMessage();
-                    case "/auth":
-                        ArrayList<String> splittedMsg = new ArrayList<>(List.of(message.text.split(" ")));
-                        if (splittedMsg.size() != 3) {
-                            return new Message(MessagesTemplates.AUTH_INCORRECT_MESSAGE.text);
-                        }
-                        return userAuth(message.userID, message.text.split(" ")[1], message.text.split(" ")[2]);
-                    default:
-                        return new Message(MessagesTemplates.DEFAULT_NOT_AUTH_MESSAGE.text);
-                }
+            case BASE_STATE -> {return baseStateHandler(message, userID, commands);}
+            case NOT_AUTHED -> {return notAuthedHandler(message, userID, commands);}
+            case WAITING_FOR_EMAIL -> {return waitingForEmailHandler(message, userID, commands);}
+            case WAITING_FOR_PASSWORD -> {return waitingForPasswordHandler(message, userID, commands);}
+            case SENDING -> {return sendingHandler(message, userID, commands);}
+            default -> { // TODO
+                stateMachine.setUserState(userID, UserState.NOT_AUTHED);
+                return new Message(MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
             }
         }
-        return null;
     }
 
-    private Message userAuth(Integer userID, String login, String pass) {
-        machine.setUserState(userID, UserState.AUTH);
-        return new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text + "\n" + MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
+    private Message baseStateHandler(Message message, Integer userID, String[] commands) {
+        switch (commands[0]) {
+            case "/auth":
+                stateMachine.setUserState(userID, UserState.WAITING_FOR_EMAIL);
+                return new Message(MessagesTemplates.WAITING_FOR_EMAIL.text);
+
+            case "/help":
+                return helpMessage();
+
+            case "/send":
+                stateMachine.setUserState(userID, UserState.BASE_STATE); // TODO изменить на sending state
+                return new Message(MessagesTemplates.SENDING_TEXT_MESSAGE.text);
+
+            case "/list":
+                return listOfMessages();
+
+            default:
+                return new Message(MessagesTemplates.DEFAULT_MESSAGE.text);
+        }
     }
 
+    private Message waitingForEmailHandler(Message message, Integer userID, String[] commands) {
+        if (false) { // TODO проверка на валидность email
+            return new Message(MessagesTemplates.MAIL_ERROR_MESSAGE.text);
+        }
 
-    private Message sendingFunctional() {
+        stateMachine.setUserState(userID, UserState.WAITING_FOR_PASSWORD);
+        return new Message(MessagesTemplates.WAITING_FOR_PASSWORD.text);
+    }
+
+    private Message waitingForPasswordHandler(Message message, Integer userID, String[] commands) {
+        if (false) { // TODO проверка на валидность пароля
+            return new Message(MessagesTemplates.AUTH_ERROR_MESSAGE.text);
+        }
+        stateMachine.setUserState(userID, UserState.BASE_STATE);
+        return new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text);
+    }
+
+    private Message notAuthedHandler(Message message, Integer userID, String[] commands) {
+        switch (commands[0]) {
+            case "/help":
+                return helpMessage();
+
+            case "/auth":
+                stateMachine.setUserState(userID, UserState.WAITING_FOR_EMAIL);
+                return new Message(MessagesTemplates.WAITING_FOR_EMAIL.text);
+
+            default:
+                return new Message(MessagesTemplates.DEFAULT_NOT_AUTH_MESSAGE.text);
+        }
+    }
+
+    private Message sendingHandler(Message message, Integer userID, String[] commands) {
         return new Message(MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
     }
 
@@ -77,4 +96,9 @@ public class BotLogic {
     private Message helpMessage() {
         return new Message(MessagesTemplates.HELP_MESSAGE.text);
     }
+
+//    private Message userAuth(Integer userID, String login, String pass) {
+//        stateMachine.setUserState(userID, UserState.BASE_STATE);
+//        return new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text + "\n" + MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
+//    }
 }
