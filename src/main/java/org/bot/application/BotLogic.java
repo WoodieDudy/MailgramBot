@@ -10,6 +10,14 @@ public class BotLogic {
 
     private final StateMachine stateMachine = new StateMachine();
 
+    public void setUserState(Integer userID, UserState userState) {
+        stateMachine.setUserState(userID, userState);
+    }
+
+    public UserState GetUserState(Integer userID) {
+        return stateMachine.getUserState(userID);
+    }
+
     public Message getStartMessage() { // Выдаёт стартовое сообщение.
         Message message = new Message(MessagesTemplates.START_MESSAGE.text);
         return message;
@@ -21,14 +29,24 @@ public class BotLogic {
         UserState userState = stateMachine.getUserState(userID);
 
         switch (userState) { // проверяет текущее состоание пользователя, от которого зависит результат вызова команды
-            case BASE_STATE -> {return baseStateHandler(message, userID, commands);}
-            case NOT_AUTHED -> {return notAuthedHandler(message, userID, commands);}
-            case WAITING_FOR_EMAIL -> {return waitingForEmailHandler(message, userID, commands);}
-            case WAITING_FOR_PASSWORD -> {return waitingForPasswordHandler(message, userID, commands);}
-            case SENDING -> {return sendingHandler(message, userID, commands);}
+            case BASE_STATE -> {
+                return baseStateHandler(message, userID, commands);
+            }
+            case NOT_AUTHED -> {
+                return notAuthedHandler(message, userID, commands);
+            }
+            case WAITING_FOR_EMAIL -> {
+                return waitingForEmailHandler(message, userID, commands);
+            }
+            case WAITING_FOR_PASSWORD -> {
+                return waitingForPasswordHandler(message, userID, commands);
+            }
+            case SENDING -> {
+                return emailSendingHandler(message, userID, commands);
+            }
             default -> { // TODO
                 stateMachine.setUserState(userID, UserState.NOT_AUTHED);
-                return new Message(MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
+                return new Message(MessagesTemplates.ERROR_MESSAGE.text);
             }
         }
     }
@@ -85,7 +103,7 @@ public class BotLogic {
         }
     }
 
-    private Message sendingHandler(Message message, Integer userID, String[] commands) {
+    private Message emailSendingHandler(Message message, Integer userID, String[] commands) {
         return new Message(MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
     }
 

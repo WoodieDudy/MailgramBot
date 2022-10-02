@@ -29,7 +29,10 @@ public enum MessagesTemplates {
 
     LIST_MESSAGE("Здесь будут отображаться последние n сообщений в твоём ящике"),
 
-    FUNCTION_NOT_AVAILABLE("Функция находится в разработке");
+    FUNCTION_NOT_AVAILABLE("Функция находится в разработке"),
+
+    ERROR_MESSAGE("Что-то пошло не так.");
+
     public final String text;
 
     MessagesTemplates(String text) {
