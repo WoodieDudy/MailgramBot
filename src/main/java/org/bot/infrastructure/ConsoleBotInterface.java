@@ -15,6 +15,6 @@ public class ConsoleBotInterface implements BotInterface {
     }
 
     public void sendMessage(Message message) {
-        System.out.println(message.text);
+        System.out.println(message.getText());
     }
 }

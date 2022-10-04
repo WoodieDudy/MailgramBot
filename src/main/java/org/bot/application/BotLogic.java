@@ -14,18 +14,14 @@ public class BotLogic {
         stateMachine.setUserState(userID, userState);
     }
 
-    public UserState GetUserState(Integer userID) {
-        return stateMachine.getUserState(userID);
-    }
-
     public Message getStartMessage() { // Выдаёт стартовое сообщение.
         Message message = new Message(MessagesTemplates.START_MESSAGE.text);
         return message;
     }
 
     public Message createResponse(Message message) {
-        Integer userID = message.userID;
-        String[] commands = message.text.split(" ");
+        Integer userID = message.getUserID();
+        String[] commands = message.getText().split(" ");
         UserState userState = stateMachine.getUserState(userID);
 
         switch (userState) { // проверяет текущее состоание пользователя, от которого зависит результат вызова команды

@@ -11,7 +11,7 @@ public class StateMachine {
         stateMachine = new HashMap<Integer, UserState>();
     }
 
-    public void setUserState(Integer userID, UserState userState) {
+    public void setUserState(Integer userID, UserState userState) { // TODO переход только в определенные стейты
         stateMachine.put(userID, userState);
     }
 

@@ -13,7 +13,7 @@ public class BotLogicTest {
 
     @Test
     public void testGetStartMessage() {
-        Message expectedMessage = new Message(MessagesTemplates.START_MESSAGE.text);
+        Message expectedMessage = new Message(MessagesTemplates.START_MESSAGE.text); // TODO параметризованные тесты
         Message receivedMessage = botLogic.getStartMessage();
         assertEquals(expectedMessage, receivedMessage);
     }
