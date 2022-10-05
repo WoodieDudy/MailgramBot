@@ -12,7 +12,6 @@ public final class Bot {
     }
 
     public void run() {
-
         Message startMessage = botLogic.getStartMessage();
         botInterface.sendMessage(startMessage);
 

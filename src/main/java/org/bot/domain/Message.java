@@ -4,8 +4,16 @@ package org.bot.domain;
 import java.util.Objects;
 
 public class Message {
-    public String text;
-    public Integer userID;
+    private final String text;
+    private Integer userID;
+
+    public String getText() {
+        return text;
+    }
+
+    public Integer getUserID() {
+        return userID;
+    }
 
     public Message(String text) {
         this.text = text;

@@ -7,16 +7,7 @@ import org.bot.enums.UserState;
 
 
 public class BotLogic {
-
     private final StateMachine stateMachine = new StateMachine();
-
-    public void setUserState(Integer userID, UserState userState) {
-        stateMachine.setUserState(userID, userState);
-    }
-
-    public UserState GetUserState(Integer userID) {
-        return stateMachine.getUserState(userID);
-    }
 
     public Message getStartMessage() { // Выдаёт стартовое сообщение.
         Message message = new Message(MessagesTemplates.START_MESSAGE.text);
@@ -24,8 +15,8 @@ public class BotLogic {
     }
 
     public Message createResponse(Message message) {
-        Integer userID = message.userID;
-        String[] commands = message.text.split(" ");
+        Integer userID = message.getUserID();
+        String[] commands = message.getText().split(" ");
         UserState userState = stateMachine.getUserState(userID);
 
         switch (userState) { // проверяет текущее состоание пользователя, от которого зависит результат вызова команды
@@ -54,19 +45,14 @@ public class BotLogic {
     private Message baseStateHandler(Message message, Integer userID, String[] commands) {
         switch (commands[0]) {
             case "/auth":
-                stateMachine.setUserState(userID, UserState.WAITING_FOR_EMAIL);
-                return new Message(MessagesTemplates.WAITING_FOR_EMAIL.text);
-
+                return new Message(MessagesTemplates.AUTH_UNAVAILABLE_MESSAGE.text);
             case "/help":
                 return helpMessage();
-
             case "/send":
-                stateMachine.setUserState(userID, UserState.BASE_STATE); // TODO изменить на sending state
+                stateMachine.setUserState(userID, UserState.SENDING);
                 return new Message(MessagesTemplates.SENDING_TEXT_MESSAGE.text);
-
             case "/list":
                 return listOfMessages();
-
             default:
                 return new Message(MessagesTemplates.DEFAULT_MESSAGE.text);
         }
@@ -76,7 +62,6 @@ public class BotLogic {
         if (false) { // TODO проверка на валидность email
             return new Message(MessagesTemplates.MAIL_ERROR_MESSAGE.text);
         }
-
         stateMachine.setUserState(userID, UserState.WAITING_FOR_PASSWORD);
         return new Message(MessagesTemplates.WAITING_FOR_PASSWORD.text);
     }
@@ -93,11 +78,13 @@ public class BotLogic {
         switch (commands[0]) {
             case "/help":
                 return helpMessage();
-
             case "/auth":
                 stateMachine.setUserState(userID, UserState.WAITING_FOR_EMAIL);
                 return new Message(MessagesTemplates.WAITING_FOR_EMAIL.text);
-
+            case "/send":
+                return new Message(MessagesTemplates.NOT_AUTH_SEND_IS_UNAVAILABLE.text);
+            case "/list":
+                return new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
             default:
                 return new Message(MessagesTemplates.DEFAULT_NOT_AUTH_MESSAGE.text);
         }
