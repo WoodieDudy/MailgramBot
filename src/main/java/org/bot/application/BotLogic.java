@@ -15,7 +15,9 @@ public class BotLogic {
     }
 
     public Message createResponse(Message message) {
+//        User user = usersRepository.get(message.getUserID());
         Integer userID = message.getUserID();
+
         String[] commands = message.getText().split(" ");
         UserState userState = stateMachine.getUserState(userID);
 

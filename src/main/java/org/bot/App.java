@@ -1,7 +1,7 @@
 package org.bot;
 
 import org.bot.application.Bot;
-import org.bot.application.BotInterface;
+import org.bot.infrastructure.interfaces.BotInterface;
 import org.bot.application.BotLogic;
 import org.bot.infrastructure.ConsoleBotInterface;
 
