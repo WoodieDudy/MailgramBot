@@ -2,12 +2,15 @@ package org.bot.application;
 
 import org.bot.domain.Message;
 import org.bot.domain.StateMachine;
+import org.bot.domain.User;
+import org.bot.domain.UserRepository;
 import org.bot.enums.MessagesTemplates;
 import org.bot.enums.UserState;
 
 
 public class BotLogic {
     private final StateMachine stateMachine = new StateMachine();
+    private final UserRepository userRepository = new UserRepository();
 
     public Message getStartMessage() { // Выдаёт стартовое сообщение.
         Message message = new Message(MessagesTemplates.START_MESSAGE.text);
@@ -15,7 +18,7 @@ public class BotLogic {
     }
 
     public Message createResponse(Message message) {
-//        User user = usersRepository.get(message.getUserID());
+        User user = userRepository.getUserById(message.getUserID());
         Integer userID = message.getUserID();
 
         String[] commands = message.getText().split(" ");
@@ -103,9 +106,4 @@ public class BotLogic {
     private Message helpMessage() {
         return new Message(MessagesTemplates.HELP_MESSAGE.text);
     }
-
-//    private Message userAuth(Integer userID, String login, String pass) {
-//        stateMachine.setUserState(userID, UserState.BASE_STATE);
-//        return new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text + "\n" + MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
-//    }
 }
