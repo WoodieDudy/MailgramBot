@@ -4,10 +4,11 @@ import com.sun.mail.imap.IMAPFolder;
 import jakarta.mail.*;
 import org.bot.domain.Letter;
 import org.bot.domain.Mailbox;
+import org.bot.exceptions.SessionTimeExpiredException;
 import org.bot.infrastructure.interfaces.MailInterface;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class JakartaMailInterface implements MailInterface {
@@ -33,14 +34,15 @@ public class JakartaMailInterface implements MailInterface {
     }
 
     @Override
-    public Letter[] readMessages(Mailbox mailbox, int lettersCount) throws MessagingException, IOException {
+    public Letter[] readMessages(Mailbox mailbox, int lettersCount)
+            throws MessagingException, IOException, SessionTimeExpiredException {
         String email = mailbox.getEmail();
         String password = mailbox.getPassword();
 
         Properties props = getProperties(email);
 
-        if (mailbox.getExpireTime().getTime() < new Date().getTime()) {
-            throw new IllegalArgumentException("Mailbox expired");
+        if (mailbox.ifSessionExpired(LocalDateTime.now())) {
+            throw new SessionTimeExpiredException("Your session has expired. You should sign in again.");
         }
 
         Session session = Session.getDefaultInstance(props, null);
@@ -62,7 +64,8 @@ public class JakartaMailInterface implements MailInterface {
         Letter[] letters = new Letter[messages.length];
         for (int i = 0; i < messages.length; i++) {
             letters[i] = Letter.fromMessage(messages[i]);
-        };
+        }
+        ;
         return letters;
     }
 
