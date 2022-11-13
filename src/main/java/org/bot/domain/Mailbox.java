@@ -1,11 +1,19 @@
 package org.bot.domain;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class Mailbox {
     private String email;
     private String password;
-    private Date expireTime;
+    private LocalDateTime authTime;
+    private final long sessionDuration = 1; // minutes
+
+    public Mailbox(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.authTime = LocalDateTime.now();
+    }
 
     public String getEmail() {
         return email;
@@ -15,7 +23,11 @@ public class Mailbox {
         return password;
     }
 
-    public Date getExpireTime() {
-        return expireTime;
+    public boolean ifSessionExpired(LocalDateTime currentDateTime) {
+        return ChronoUnit.MINUTES.between(authTime, currentDateTime) > sessionDuration;
+    }
+
+    public void updateAuthTime(LocalDateTime time) {
+        this.authTime = time;
     }
 }
