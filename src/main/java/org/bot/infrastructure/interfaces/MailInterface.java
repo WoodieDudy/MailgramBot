@@ -12,4 +12,6 @@ public interface MailInterface {
     public Letter[] readMessages(Mailbox mailbox, int lettersCount) throws MessagingException, IOException, SessionTimeExpiredException;
 
     public void sendMessage(Mailbox mailbox, Letter letter);
+
+    public boolean isCredentialsCorrect(Mailbox mailbox);
 }

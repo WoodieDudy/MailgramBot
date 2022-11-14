@@ -35,7 +35,8 @@ public enum MessagesTemplates {
 
     FUNCTION_NOT_AVAILABLE("Функция находится в разработке"),
 
-    ERROR_MESSAGE("Что-то пошло не так.");
+    ERROR_MESSAGE("Что-то пошло не так."),
+    SESSION_EXPIRED("Сессия истекла, введите /auth для повторной авторизации");
 
     public final String text;
 
