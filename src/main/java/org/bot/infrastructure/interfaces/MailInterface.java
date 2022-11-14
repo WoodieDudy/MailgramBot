@@ -9,7 +9,7 @@ import java.io.IOException;
 
 
 public interface MailInterface {
-    public Letter[] readMessages(Mailbox mailbox, int lettersCount) throws MessagingException, IOException, SessionTimeExpiredException;
+    public Letter[] readMessages(Mailbox mailbox, int lettersCount) throws MessagingException, SessionTimeExpiredException;
 
     public void sendMessage(Mailbox mailbox, Letter letter);
 

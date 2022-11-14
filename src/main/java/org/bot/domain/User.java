@@ -1,17 +1,20 @@
 package org.bot.domain;
 
+import org.bot.enums.UserState;
 import org.bot.exceptions.EmailNotFoundException;
 
 import java.util.HashMap;
 
 public class User {
     private final Integer id;
+    private UserState state;
     private final HashMap<String, Mailbox> mailboxes;
     private String tempEmail;
 
     public User(Integer id) {
         this.id = id;
         mailboxes = new HashMap<>();
+        state = UserState.NOT_AUTHED;
     }
 
     public Integer getID() {
@@ -31,6 +34,13 @@ public class User {
 
     public Mailbox getMailbox(String email) {
         return mailboxes.get(email);
+    }
+
+    public UserState getState() {
+        return state;
+    }
+    public void changeState(UserState state) {
+        this.state = state;
     }
 
     public void setTempEmail(String email) {
