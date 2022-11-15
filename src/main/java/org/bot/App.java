@@ -23,7 +23,7 @@ public class App {
         bot.run();
     }
 
-    private static Command[] createCommands(MailInterface mailInterface) {
+    private static Command[] createCommands(MailInterface mailInterface) { // TODO: send messages in commands
         HelpCommand helpCommand = new HelpCommand();
         Command[] commands = {
                 new AuthCommand(mailInterface),

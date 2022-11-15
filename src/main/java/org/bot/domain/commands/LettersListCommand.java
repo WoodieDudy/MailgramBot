@@ -44,7 +44,7 @@ public class LettersListCommand extends Command {
             args = parseArgs(rawArgs);
         }
         catch (Exception e) {
-            return new Message(MessagesTemplates.AUTH_INCORRECT_MESSAGE.text);
+            return new Message(MessagesTemplates.INCORRECT_ARGS.text);
         }
         Mailbox mailbox = user.getMailbox(args.email);
 
