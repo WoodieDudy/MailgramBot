@@ -2,19 +2,21 @@ package org.bot.domain.commands;
 
 import org.bot.domain.Message;
 import org.bot.domain.User;
-import org.bot.infrastructure.interfaces.MailInterface;
 
-public class Command {
-    protected final MailInterface mailInterface;
-    String alias;
-    String description; // TODO: add description
+abstract public class Command {
+    private final String alias;
+    private final String description;
 
-    public Command(MailInterface mailInterface) {
-        this.mailInterface = mailInterface;
+    public Command(String alias, String description) {
+        this.alias = alias;
+        this.description = description;
+    }
+    public String getAlias() {
+        return alias;
+    }
+    public String getDescription() {
+        return description;
     }
 
-    public Message execute(User user, String[] args) {
-        return null;
-    }
-
+    public abstract Message execute(User user, String[] args);
 }

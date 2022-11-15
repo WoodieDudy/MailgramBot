@@ -75,12 +75,7 @@ public class JakartaMailInterface implements MailInterface {
     @Override
     public boolean isCredentialsCorrect(Mailbox mailbox){
         try {
-            Properties properties = new Properties();
-            properties.setProperty("mail.store.protocol", "imap");
-            properties.setProperty("mail.imap.ssl.enable", "true");
-            properties.setProperty("mail.imap.host", "imap.gmail.com");
-            properties.setProperty("mail.imap.port", "993");
-
+            Properties properties = getProperties(mailbox.getEmail());
             Session session = Session.getInstance(properties, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {

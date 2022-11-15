@@ -7,8 +7,7 @@ import org.bot.enums.MessagesTemplates;
 import org.bot.infrastructure.interfaces.MailInterface;
 
 public class AuthCommand extends Command {
-    String alias = "/auth";
-    String description = "/auth <email> <password> - authenticate to mailbox";
+    private final MailInterface mailInterface;
     record Args(String email, String password) {}
     private Args parseArgs(String[] args) {
         String email = args[0];
@@ -17,7 +16,11 @@ public class AuthCommand extends Command {
     }
 
     public AuthCommand(MailInterface mailInterface) {
-        super(mailInterface);
+        super(
+            "/auth",
+            "<email> <password> - authenticate to mailbox"
+        );
+        this.mailInterface = mailInterface;
     }
 
     public Message execute(User user, String[] args) {

@@ -10,9 +10,7 @@ import org.bot.exceptions.SessionTimeExpiredException;
 import org.bot.infrastructure.interfaces.MailInterface;
 
 public class LettersListCommand extends Command {
-    String alias = "/letters";
-    String description = "/letters <email> <n> - get n letters";
-
+    private final MailInterface mailInterface;
     record Args(String email, int lettersCount) {}
     private Args parseArgs(String[] args) throws NumberFormatException {
         String email = args[0];
@@ -21,7 +19,11 @@ public class LettersListCommand extends Command {
     }
 
     public LettersListCommand(MailInterface mailInterface) {
-        super(mailInterface);
+        super(
+            "/letters",
+            "<email> <n> - get n letters"
+        );
+        this.mailInterface = mailInterface;
     }
 
     public Message execute(User user, String[] args) {
