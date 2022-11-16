@@ -1,7 +1,11 @@
-Бот позволяет получать письма посредством Telegram.
-Задачи:
-1. Реализован разговор с пользователем в консоли, настроена обработка неправильных команд и переключение "стейтов" (states),
-необходиммых для определения доступного в данный момент инструментария бота.
+# MailgramBot
+<img src="assets/snippet.png">
+
+### MailgramBot is a email client for Telegram 
+
+Tasks:
+1. Implemented a conversation with the user in the console, configured the processing of incorrect commands and switching "states" (states)
+necessary to determine the currently available tools of the bot.
 
 # About.
 Java-based Telegram bot that provides the functionality of receiving emails.
