@@ -62,7 +62,7 @@ public class JakartaMailInterface implements MailInterface {
 
         Letter[] letters = new Letter[mailMessages.length];
         for (int i = 0; i < mailMessages.length; i++) {
-            letters[i] = Letter.fromMessage(mailMessages[i]);
+            letters[i] = Letter.fromMailMessage(mailMessages[i]);
         }
         return letters;
     }

@@ -33,7 +33,7 @@ public class Letter {
         return date;
     }
 
-    public static Letter fromMessage(Message message){
+    public static Letter fromMailMessage(Message message){
         Letter letter = new Letter();
         letter.subject = parseSubject(message);
         letter.body = parseBody(message);
@@ -55,6 +55,7 @@ public class Letter {
             Address[] froms = message.getFrom();
             return ((InternetAddress) froms[0]).getAddress();
         } catch (MessagingException e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -67,6 +68,9 @@ public class Letter {
             } else if (message.isMimeType("multipart/*")) {
                 MimeMultipart mimeMultipart = (MimeMultipart) message.getContent();
                 result = getTextFromMimeMultipart(mimeMultipart);
+            }
+            else {
+                System.out.println("Unknown message type: " + message.getContentType());
             }
             result = result.replaceAll("[\r\n\s ]{2,}", "\n");
             result = result.replaceAll("[\t\s ]{2,}", "\s");
@@ -94,7 +98,7 @@ public class Letter {
             if (bodyPart.isMimeType("text/plain")) {
                 String text = bodyPart.getContent().toString();
                 letterLines.add(text);
-                break; // without break same text appears twice in my tests
+//                break; // without break same text appears twice in my tests
             } else if (bodyPart.isMimeType("text/html")) {
                 String html = (String) bodyPart.getContent();
                 String text = Jsoup.parse(html).text();

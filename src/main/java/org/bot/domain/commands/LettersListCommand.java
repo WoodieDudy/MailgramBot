@@ -9,6 +9,8 @@ import org.bot.enums.MessagesTemplates;
 import org.bot.exceptions.SessionTimeExpiredException;
 import org.bot.infrastructure.interfaces.MailInterface;
 
+import java.util.StringJoiner;
+
 public class LettersListCommand extends Command {
     private final MailInterface mailInterface;
     record Args(String email, int lettersCount) {}
@@ -63,10 +65,10 @@ public class LettersListCommand extends Command {
             return new Message(MessagesTemplates.ERROR_MESSAGE.text);
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner joiner = new StringJoiner("\n\n\n");
         for (Letter letter : letters) {
-            stringBuilder.append(letter.toString());
+            joiner.add(letter.toString());
         }
-        return new Message(stringBuilder.toString());
+        return new Message(joiner.toString());
     }
 }
