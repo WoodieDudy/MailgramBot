@@ -1,132 +1,74 @@
 package org.bot;
 
-import org.bot.application.BotLogic;
+import org.bot.domain.Letter;
+import org.bot.domain.Mailbox;
 import org.bot.domain.Message;
+import org.bot.domain.User;
+import org.bot.domain.commands.AuthCommand;
+import org.bot.domain.commands.Command;
+import org.bot.domain.commands.LettersListCommand;
 import org.bot.enums.MessagesTemplates;
+import org.bot.infrastructure.interfaces.MailInterface;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BotLogicTest {
-    BotLogic botLogic = new BotLogic();
+    static class DummyMailInterface implements MailInterface {
+        @Override
+        public void sendMessage(Mailbox mailbox, Letter letter) {}
+
+        @Override
+        public boolean isCredentialsCorrect(Mailbox mailbox) {
+            return mailbox.getEmail().equals("test@test.com") && mailbox.getPassword().equals("amogus");
+        }
+    }
+
+    User user = new User(1);
+    MailInterface mailInterface = new DummyMailInterface();
 
     @Test
-    public void testGetStartMessage() {
-        Message expectedMessage = new Message(MessagesTemplates.START_MESSAGE.text); // TODO параметризованные тесты
-        Message receivedMessage = botLogic.getStartMessage();
-        assertEquals(expectedMessage, receivedMessage);
+    public void testGetLettersCommandUnAuthed() {
+        Command lettersListCommand = new LettersListCommand(mailInterface);
+        Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
+        assertEquals(message.getText(), MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
     }
 
     @Test
-    public void testNotAuthedHandlerForHelp() {
-        Message expectedMessage = new Message(MessagesTemplates.HELP_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/help", -1));
-        assertEquals(expectedMessage, receivedMessage);
+    public void testAuthCommandNotValid() {
+        Command auth = new AuthCommand(mailInterface, 1);
+        Message message = auth.execute(user, new String[]{"test@test.com", "123"});
+        assertEquals(MessagesTemplates.AUTH_ERROR_MESSAGE.text, message.getText());
     }
 
     @Test
-    public void testNotAuthedHandlerForList() {
-        Message expectedMessage = new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/list", -1));
-        assertEquals(expectedMessage, receivedMessage);
+    public void testAuthCommandValid() {
+        Command auth = new AuthCommand(mailInterface, 1);
+        Message message = auth.execute(user, new String[]{"test@test.com", "amogus"});
+        assertEquals(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text, message.getText());
     }
 
     @Test
-    public void testNotAuthedHandlerForSend() {
-        Message expectedMessage = new Message(MessagesTemplates.NOT_AUTH_SEND_IS_UNAVAILABLE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/send", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
+    public void testGetLettersCommandAuthed() {
+        Command auth = new AuthCommand(mailInterface, 1);
+        auth.execute(user, new String[]{"test@test.com", "amogus"});
 
-    @Test
-    public void testNotAuthedHandlerForAuth() {
-        Message expectedMessage = new Message(MessagesTemplates.WAITING_FOR_EMAIL.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/auth", -1));
-        assertEquals(expectedMessage, receivedMessage);
+        Command lettersListCommand = new LettersListCommand(mailInterface);
+        Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
+        assertNotEquals(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, message.getText());
     }
-
+    
     @Test
-    public void testWaitingForEmailHandlerCorrectInput() {
-        botLogic.createResponse(new Message("/auth", -1));
-        Message expectedMessage = new Message(MessagesTemplates.WAITING_FOR_PASSWORD.text);
-        Message receivedMessage = botLogic.createResponse(new Message("example@gmail.com", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
+    public void testSessionExpired() throws InterruptedException {
+        Command auth = new AuthCommand(mailInterface, 0);
+        auth.execute(user, new String[]{"test@test.com", "amogus"});
+        Command lettersListCommand = new LettersListCommand(mailInterface);
 
-    @Test
-    public void testWaitingForPasswordHandlerCorrectInput() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        Message expectedMessage = new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("`123455678`", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
+        TimeUnit.SECONDS.sleep(1);
 
-    @Test
-    public void testNotAuthedHandlerForWrongMessage() {
-        Message expectedMessage = new Message(MessagesTemplates.DEFAULT_NOT_AUTH_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/hlep", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
-
-    @Test
-    public void testBaseStateHandlerForHelp() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        botLogic.createResponse(new Message("qwerty12345", -1));
-        Message expectedMessage = new Message(MessagesTemplates.HELP_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/help", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
-
-    @Test
-    public void testBaseStateHandlerForAuth() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        botLogic.createResponse(new Message("qwerty12345", -1));
-        Message expectedMessage = new Message(MessagesTemplates.AUTH_UNAVAILABLE_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/auth", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
-
-    @Test
-    public void testBaseStateHandlerForSend() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        botLogic.createResponse(new Message("qwerty12345", -1));
-        Message expectedMessage = new Message(MessagesTemplates.SENDING_TEXT_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/send", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
-
-    @Test
-    public void testBaseStateHandlerForList() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        botLogic.createResponse(new Message("qwerty12345", -1));
-        Message expectedMessage = new Message(MessagesTemplates.LIST_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/list", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
-
-    @Test
-    public void testBaseStateHandlerForWrongMessage() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        botLogic.createResponse(new Message("qwerty12345", -1));
-        Message expectedMessage = new Message(MessagesTemplates.DEFAULT_MESSAGE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("/hlep", -1));
-        assertEquals(expectedMessage, receivedMessage);
-    }
-
-    @Test
-    public void testEmailSendingHandler() {
-        botLogic.createResponse(new Message("/auth", -1));
-        botLogic.createResponse(new Message("example@gmail.com", -1));
-        botLogic.createResponse(new Message("qwerty12345", -1));
-        botLogic.createResponse(new Message("/send", -1));
-        Message expectedMessage = new Message(MessagesTemplates.FUNCTION_NOT_AVAILABLE.text);
-        Message receivedMessage = botLogic.createResponse(new Message("Привет!", -1));
-        assertEquals(expectedMessage, receivedMessage);
+        Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
+        assertEquals(MessagesTemplates.SESSION_EXPIRED.text, message.getText() );
     }
 }

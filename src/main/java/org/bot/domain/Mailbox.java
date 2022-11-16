@@ -7,12 +7,13 @@ public class Mailbox {
     private String email;
     private String password;
     private LocalDateTime authTime;
-    private final long sessionDuration = 1; // minutes
+    private long sessionDurationSeconds;
 
-    public Mailbox(String email, String password) {
+    public Mailbox(String email, String password, long sessionDurationSeconds) {
         this.email = email;
         this.password = password;
         this.authTime = LocalDateTime.now();
+        this.sessionDurationSeconds = sessionDurationSeconds;
     }
 
     public String getEmail() {
@@ -24,7 +25,7 @@ public class Mailbox {
     }
 
     public boolean ifSessionExpired(LocalDateTime currentDateTime) {
-        return ChronoUnit.MINUTES.between(authTime, currentDateTime) > sessionDuration;
+        return ChronoUnit.SECONDS.between(authTime, currentDateTime) > sessionDurationSeconds;
     }
 
     public void updateAuthTime(LocalDateTime time) {
