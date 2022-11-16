@@ -11,15 +11,12 @@ import org.bot.enums.MessagesTemplates;
 import org.bot.infrastructure.interfaces.MailInterface;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BotLogicTest {
     static class DummyMailInterface implements MailInterface {
-        @Override
-        public Letter[] readMessages(Mailbox mailbox, int lettersCount) {
-            return new Letter[0];
-        }
-
         @Override
         public void sendMessage(Mailbox mailbox, Letter letter) {}
 
@@ -34,33 +31,44 @@ public class BotLogicTest {
 
     @Test
     public void testGetLettersCommandUnAuthed() {
-        Command command = new LettersListCommand(mailInterface);
-        Message message = command.execute(user, new String[]{"test@test.com", "3"});
+        Command lettersListCommand = new LettersListCommand(mailInterface);
+        Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
         assertEquals(message.getText(), MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
     }
 
     @Test
     public void testAuthCommandNotValid() {
-        Command auth = new AuthCommand(mailInterface);
+        Command auth = new AuthCommand(mailInterface, 1);
         Message message = auth.execute(user, new String[]{"test@test.com", "123"});
         assertEquals(MessagesTemplates.AUTH_ERROR_MESSAGE.text, message.getText());
     }
 
     @Test
     public void testAuthCommandValid() {
-        Command auth = new AuthCommand(mailInterface);
+        Command auth = new AuthCommand(mailInterface, 1);
         Message message = auth.execute(user, new String[]{"test@test.com", "amogus"});
-        assertEquals(user.getMailbox("test@test.com").getEmail(), "test@test.com");
         assertEquals(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text, message.getText());
     }
 
     @Test
     public void testGetLettersCommandAuthed() {
-        Command auth = new AuthCommand(mailInterface);
+        Command auth = new AuthCommand(mailInterface, 1);
         auth.execute(user, new String[]{"test@test.com", "amogus"});
 
-        Command command = new LettersListCommand(mailInterface);
-        Message message = command.execute(user, new String[]{"test@test.com", "3"});
-        assertNotEquals(message.getText(), MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
+        Command lettersListCommand = new LettersListCommand(mailInterface);
+        Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
+        assertNotEquals(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, message.getText());
+    }
+    
+    @Test
+    public void testSessionExpired() throws InterruptedException {
+        Command auth = new AuthCommand(mailInterface, 0);
+        auth.execute(user, new String[]{"test@test.com", "amogus"});
+        Command lettersListCommand = new LettersListCommand(mailInterface);
+
+        TimeUnit.SECONDS.sleep(1);
+
+        Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
+        assertEquals(MessagesTemplates.SESSION_EXPIRED.text, message.getText() );
     }
 }

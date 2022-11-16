@@ -26,9 +26,9 @@ public class App {
     private static Command[] createCommands(MailInterface mailInterface) { // TODO: send messages in commands
         HelpCommand helpCommand = new HelpCommand();
         Command[] commands = {
-                new AuthCommand(mailInterface),
-                new LettersListCommand(mailInterface),
-                helpCommand
+            new AuthCommand(mailInterface, 300),
+            new LettersListCommand(mailInterface),
+            helpCommand
         };
         helpCommand.generateHelpMessage(commands);
         return commands;

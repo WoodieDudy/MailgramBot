@@ -30,14 +30,6 @@ public class LettersListCommand extends Command {
 
     public Message execute(User user, String[] args) {
         return baseStateHandler(user, args);
-//        switch (user.getState()) {
-//            case BASE_STATE -> {
-//                return baseStateHandler(user, args);
-//            }
-//            default -> {
-//                return new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
-//            }
-//        }
     }
 
     private Message baseStateHandler(User user, String[] rawArgs) {
