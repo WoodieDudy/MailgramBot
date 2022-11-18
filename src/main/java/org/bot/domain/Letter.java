@@ -69,8 +69,12 @@ public class Letter {
                 MimeMultipart mimeMultipart = (MimeMultipart) message.getContent();
                 result = getTextFromMimeMultipart(mimeMultipart);
             }
+            else if (message.isMimeType("text/html")) {
+                String html = (String) message.getContent();
+                result = Jsoup.parse(html).text();
+            }
             else {
-                System.out.println("Unknown message type: " + message.getContentType());
+                System.out.println("Unknown message type " + message.getContentType());
             }
             result = result.replaceAll("[\r\n\s ]{2,}", "\n");
             result = result.replaceAll("[\t\s ]{2,}", "\s");
