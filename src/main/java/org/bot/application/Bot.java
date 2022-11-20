@@ -1,6 +1,7 @@
 package org.bot.application;
 
 import org.bot.domain.Message;
+import org.bot.infrastructure.interfaces.BotInterface;
 
 public final class Bot {
     private final BotInterface botInterface;

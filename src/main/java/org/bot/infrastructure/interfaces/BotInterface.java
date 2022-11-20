@@ -1,4 +1,4 @@
-package org.bot.application;
+package org.bot.infrastructure.interfaces;
 
 import org.bot.domain.Message;
 

@@ -1,7 +1,7 @@
 package org.bot.infrastructure;
 
 
-import org.bot.application.BotInterface;
+import org.bot.infrastructure.interfaces.BotInterface;
 import org.bot.domain.Message;
 
 import java.util.Scanner;
