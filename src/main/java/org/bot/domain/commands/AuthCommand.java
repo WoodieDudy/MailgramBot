@@ -33,14 +33,14 @@ public class AuthCommand extends Command {
             parsedArgs = parseArgs(args);
         }
         catch (Exception e) {
-            return new Message(MessagesTemplates.AUTH_INCORRECT_MESSAGE.text);
+            return new Message(MessagesTemplates.AUTH_INCORRECT_MESSAGE.text, user.getId());
         }
         Mailbox mailbox = new Mailbox(parsedArgs.email(), parsedArgs.password(), sessionDuration);
         if (this.mailInterface.isCredentialsCorrect(mailbox)) {
             user.addNewMailbox(mailbox);
-            return new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text);
+            return new Message(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text, user.getId());
         }
-        return new Message(MessagesTemplates.AUTH_ERROR_MESSAGE.text);
+        return new Message(MessagesTemplates.AUTH_ERROR_MESSAGE.text, user.getId());
     }
 }
 

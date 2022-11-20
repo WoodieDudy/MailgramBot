@@ -12,7 +12,7 @@ public class ConsoleBotInterface implements BotInterface {
 
     public Message readMessage() {
         String text = in.nextLine();
-        return new Message(text, 0);
+        return new Message(text, 0L);
     }
 
     public void sendMessage(Message message) {

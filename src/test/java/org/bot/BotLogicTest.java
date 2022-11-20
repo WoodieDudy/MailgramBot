@@ -28,7 +28,7 @@ public class BotLogicTest {
         }
     }
 
-    User user = new User(1);
+    User user = new User(1L);
     MailInterface mailInterface = new DummyMailInterface();
 
     @Test

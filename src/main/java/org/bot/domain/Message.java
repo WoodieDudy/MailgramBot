@@ -5,23 +5,24 @@ import java.util.Objects;
 
 public class Message {
     private final String text;
-    private Integer userID;
+    private Long userID;
 
     public String getText() {
         return text;
     }
 
-    public Integer getUserID() {
+    public Long getUserID() {
         return userID;
     }
 
-    public Message(String text) {
-        this.text = text;
-    }
-
-    public Message(String text, Integer userID) {
+    public Message(String text, Long userID) {
         this.text = text;
         this.userID = userID;
+    }
+
+    public Message(Update update) {
+        text = update.message().text();
+        userID = update.message().chat().id();
     }
 
     @Override

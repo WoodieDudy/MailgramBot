@@ -13,7 +13,10 @@ import java.util.StringJoiner;
 
 public class LettersListCommand extends Command {
     private final MailInterface mailInterface;
-    record Args(String email, int lettersCount) {}
+
+    record Args(String email, int lettersCount) {
+    }
+
     private Args parseArgs(String[] args) throws NumberFormatException {
         String email = args[0];
         int lettersCount = Integer.parseInt(args[1]);
@@ -22,8 +25,8 @@ public class LettersListCommand extends Command {
 
     public LettersListCommand(MailInterface mailInterface) {
         super(
-            "/letters",
-            "<email> <n> - get n letters"
+                "/letters",
+                "<email> <n> - get n letters"
         );
         this.mailInterface = mailInterface;
     }
@@ -36,27 +39,25 @@ public class LettersListCommand extends Command {
         Args args;
         try {
             args = parseArgs(rawArgs);
-        }
-        catch (Exception e) {
-            return new Message(MessagesTemplates.INCORRECT_ARGS.text);
+        } catch (Exception e) {
+            return new Message(MessagesTemplates.INCORRECT_ARGS.text, user.getId());
         }
         Mailbox mailbox = user.getMailbox(args.email);
 
         if (mailbox == null) {
-            return new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
+            return new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, user.getId());
         }
 
         Letter[] letters;
         try {
             letters = this.mailInterface.readMessages(mailbox, args.lettersCount);
-        }
-        catch (SessionTimeExpiredException e) {
-            return new Message(MessagesTemplates.SESSION_EXPIRED.text);
-        }
-        catch (MessagingException e) {
-            return new Message(MessagesTemplates.ERROR_MESSAGE.text);
+        } catch (SessionTimeExpiredException e) {
+            return new Message(MessagesTemplates.SESSION_EXPIRED.text, user.getId());
+        } catch (MessagingException e) {
+            return new Message(MessagesTemplates.ERROR_MESSAGE.text, user.getId());
         }
 
+        // TODO: Telegraph для чтения писем мб.
         StringJoiner joiner = new StringJoiner("\n\n\n");
         for (Letter letter : letters) {
             joiner.add(letter.toString());

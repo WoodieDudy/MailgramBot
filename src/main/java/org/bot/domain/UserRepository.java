@@ -5,18 +5,18 @@ import org.bot.exceptions.IdNotFoundException;
 import java.util.HashMap;
 
 public class UserRepository {
-    private HashMap<Integer, User> userRepository;
+    private HashMap<Long, User> userRepository;
 
     public UserRepository() {
         userRepository = new HashMap<>();
     }
 
     public void addUser(User user) {
-        Integer id = user.getID();
+        Long id = user.getId();
         userRepository.put(id, user);
     }
 
-    public void deleteUserById(Integer id) throws IdNotFoundException {
+    public void deleteUserById(Long id) throws IdNotFoundException {
         if (userRepository.containsKey(id)) {
             userRepository.remove(id);
             return;
@@ -24,7 +24,7 @@ public class UserRepository {
         throw new IdNotFoundException("There is no such identifier in the repository.");
     }
 
-    public User getUserById(Integer id) {
+    public User getUserById(Long id) {
         if (!userRepository.containsKey(id)) {
             userRepository.put(id, new User(id));
         }

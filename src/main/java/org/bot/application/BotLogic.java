@@ -25,8 +25,8 @@ public class BotLogic {
     }
 
     public Message createResponse(Message message) {
-        Integer userID = message.getUserID();
-        User user = userRepository.getUserById(userID);
+        Long userId = message.getUserID();
+        User user = userRepository.getUserById(userId);
 
         String[] args = message.getText().split(" ");
 
@@ -36,6 +36,6 @@ public class BotLogic {
         if (commands.containsKey(commandName)) {
             return commands.get(commandName).execute(user, args);
         }
-        return new Message(MessagesTemplates.DEFAULT_MESSAGE.text);
+        return new Message(MessagesTemplates.DEFAULT_MESSAGE.text, userId);
     }
 }

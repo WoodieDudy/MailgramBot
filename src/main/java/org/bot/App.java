@@ -1,5 +1,6 @@
 package org.bot;
 
+import com.pengrad.telegrambot.TelegramBot;
 import org.bot.application.Bot;
 import org.bot.domain.commands.AuthCommand;
 import org.bot.domain.commands.Command;
@@ -20,8 +21,12 @@ public class App {
 
         Command[] commands = createCommands(mailInterface);
 
+        // TODO: нужен String token.
+        TelegramBot telegramBot = new TelegramBot(token);
+
         BotLogic botLogic = new BotLogic(commands);
-        Bot bot = new Bot(botInterface, botLogic);
+        BotInterface botInterface = new TelegramBotInterface(telegramBot);
+        Bot bot = new Bot(botInterface, botLogic, telegramBot);
         bot.run();
     }
 

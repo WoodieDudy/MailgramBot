@@ -25,6 +25,6 @@ public class HelpCommand extends Command {
     }
 
     public Message execute(User user, String[] args) {
-        return new Message(helpMessage);
+        return new Message(helpMessage, user.getId());
     }
 }
