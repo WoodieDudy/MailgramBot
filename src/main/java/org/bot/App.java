@@ -11,6 +11,8 @@ import org.bot.application.BotLogic;
 import org.bot.infrastructure.ConsoleBotInterface;
 import org.bot.infrastructure.interfaces.MailInterface;
 
+import java.time.Duration;
+
 public class App {
     public static void main(String[] args) {
         BotInterface botInterface = new ConsoleBotInterface();
@@ -26,7 +28,7 @@ public class App {
     private static Command[] createCommands(MailInterface mailInterface) { // TODO: send messages in commands
         HelpCommand helpCommand = new HelpCommand();
         Command[] commands = {
-            new AuthCommand(mailInterface, 300),
+            new AuthCommand(mailInterface, Duration.ofDays(1)),
             new LettersListCommand(mailInterface),
             helpCommand
         };

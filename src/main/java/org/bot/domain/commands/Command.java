@@ -11,9 +11,11 @@ abstract public class Command {
         this.alias = alias;
         this.description = description;
     }
+
     public String getAlias() {
         return alias;
     }
+
     public String getDescription() {
         return description;
     }

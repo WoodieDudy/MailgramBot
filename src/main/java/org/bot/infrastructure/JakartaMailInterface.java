@@ -7,7 +7,6 @@ import org.bot.domain.Mailbox;
 import org.bot.exceptions.SessionTimeExpiredException;
 import org.bot.infrastructure.interfaces.MailInterface;
 
-import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class JakartaMailInterface implements MailInterface {
@@ -40,7 +39,7 @@ public class JakartaMailInterface implements MailInterface {
 
         Properties props = getProperties(email);
 
-        if (mailbox.ifSessionExpired(LocalDateTime.now())) {
+        if (mailbox.isSessionExpired()) {
             throw new SessionTimeExpiredException("Your session has expired. You should sign in again.");
         }
 
