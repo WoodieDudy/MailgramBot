@@ -20,11 +20,6 @@ public class Message {
         this.userID = userID;
     }
 
-    public Message(Update update) {
-        text = update.message().text();
-        userID = update.message().chat().id();
-    }
-
     @Override
     public boolean equals(Object object) {
         if (object == this) {

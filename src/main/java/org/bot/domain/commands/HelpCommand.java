@@ -8,7 +8,7 @@ public class HelpCommand extends Command {
 
     public HelpCommand() {
         super(
-            "/help",
+            "help",
             "- get help"
         );
     }
@@ -16,6 +16,7 @@ public class HelpCommand extends Command {
     public void generateHelpMessage(Command[] commands) {
         StringBuilder helpMessageBuilder = new StringBuilder();
         for (Command command : commands) {
+            helpMessageBuilder.append("/");
             helpMessageBuilder.append(command.getAlias());
             helpMessageBuilder.append(" ");
             helpMessageBuilder.append(command.getDescription());

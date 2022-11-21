@@ -23,7 +23,7 @@ public class AuthCommand extends Command {
 
     public AuthCommand(MailInterface mailInterface, Duration sessionDuration) {
         super(
-            "/auth",
+            "auth",
             "<email> <password> - authenticate to mailbox"
         );
         this.mailInterface = mailInterface;

@@ -14,8 +14,7 @@ import java.util.StringJoiner;
 public class LettersListCommand extends Command {
     private final MailInterface mailInterface;
 
-    record Args(String email, int lettersCount) {
-    }
+    record Args(String email, int lettersCount) {}
 
     private Args parseArgs(String[] args) throws NumberFormatException {
         String email = args[0];
@@ -25,8 +24,8 @@ public class LettersListCommand extends Command {
 
     public LettersListCommand(MailInterface mailInterface) {
         super(
-                "/letters",
-                "<email> <n> - get n letters"
+            "letters",
+            "<email> <n> - get n letters"
         );
         this.mailInterface = mailInterface;
     }
@@ -62,6 +61,8 @@ public class LettersListCommand extends Command {
         for (Letter letter : letters) {
             joiner.add(letter.toString());
         }
-        return new Message(joiner.toString());
+        String cutLetters = joiner.toString().substring(0, Math.min(joiner.toString().length(), 4090)) + "\n...";
+        System.out.println(cutLetters);
+        return new Message(cutLetters, user.getId());
     }
 }
