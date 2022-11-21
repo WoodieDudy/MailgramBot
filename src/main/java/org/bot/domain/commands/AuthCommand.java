@@ -15,6 +15,9 @@ public class AuthCommand extends Command {
     private Args parseArgs(String[] args) {
         String email = args[0];
         String password = args[1];
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException("Invalid email");
+        }
         return new Args(email, password);
     }
 
