@@ -1,4 +1,4 @@
-package org.bot.domain.commands;
+package org.bot.application.commands;
 
 import org.bot.domain.Message;
 import org.bot.domain.User;

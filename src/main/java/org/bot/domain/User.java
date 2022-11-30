@@ -4,12 +4,13 @@ import org.bot.enums.UserState;
 import org.bot.exceptions.EmailNotFoundException;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class User {
     private final Long id;
     private UserState state;
     private final HashMap<String, Mailbox> mailboxes;
-    private String tempEmail;
+    private String tempEmail = null;
 
     public User(Long id) {
         this.id = id;
@@ -34,6 +35,10 @@ public class User {
 
     public Mailbox getMailbox(String email) {
         return mailboxes.get(email);
+    }
+
+    public List<String> getAllEmails() {
+        return List.copyOf(mailboxes.keySet());
     }
 
     public UserState getState() {

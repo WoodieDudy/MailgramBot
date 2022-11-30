@@ -1,4 +1,4 @@
-package org.bot.domain.commands;
+package org.bot.application.commands;
 
 import jakarta.mail.MessagingException;
 import org.bot.domain.Letter;
