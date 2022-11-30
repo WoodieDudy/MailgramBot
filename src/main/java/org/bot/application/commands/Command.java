@@ -22,5 +22,5 @@ abstract public class Command {
         return description;
     }
 
-    public abstract Message execute(User user, String[] args);
+    public abstract List<Message> execute(User user, List<String> args);
 }

@@ -3,6 +3,8 @@ package org.bot.application.commands;
 import org.bot.domain.Message;
 import org.bot.domain.User;
 
+import java.util.List;
+
 public class HelpCommand extends Command {
     String helpMessage;
 
@@ -25,7 +27,7 @@ public class HelpCommand extends Command {
         helpMessage = helpMessageBuilder.toString();
     }
 
-    public Message execute(User user, String[] args) {
-        return new Message(helpMessage, user.getId());
+    public List<Message> execute(User user, List<String> args) {
+        return List.of(new Message(helpMessage, user.getId()));
     }
 }
