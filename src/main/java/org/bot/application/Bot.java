@@ -12,6 +12,7 @@ import org.bot.infrastructure.interfaces.MailInterface;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSerializable;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -81,11 +82,13 @@ public final class Bot extends AbilityBot {
                 buttons.add(button);
             }
 
+            System.out.println(fromMessageId);
+
             org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
                 "Выберите количество писем",
-                Integer.parseInt(fromMessageId),
-                update.getCallbackQuery().getFrom().getId(),
-                buttons
+               Integer.parseInt(fromMessageId),
+               update.getCallbackQuery().getFrom().getId(),
+               buttons
             );
 
             List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
@@ -93,6 +96,10 @@ public final class Bot extends AbilityBot {
             for (BotApiMethodSerializable botApiMethodSerializable : executable) {
                 silent.execute(botApiMethodSerializable);
             }
+        }
+        else if (commandAlias.equals("chooseNum")) {
+            List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
+            sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
         }
     }
 
@@ -117,7 +124,7 @@ public final class Bot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     User user = userRepository.getUserById(ctx.chatId());
-                    silent.send(commands.get(abilityName).execute(user,  ctx.arguments()).getText(), ctx.chatId());
+                    sendAll(commands.get(abilityName).execute(user, List.of(ctx.arguments())), ctx.chatId());
                 })
                 .build();
     }
@@ -132,7 +139,7 @@ public final class Bot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     User user = userRepository.getUserById(ctx.chatId());
-                    silent.send(commands.get(abilityName).execute(user,  ctx.arguments()).getText(), ctx.chatId());
+                    sendAll(commands.get(abilityName).execute(user, List.of(ctx.arguments())), ctx.chatId());
                 })
                 .build();
     }
@@ -174,7 +181,7 @@ public final class Bot extends AbilityBot {
                     List<InlineKeyboardButton> buttons = new ArrayList<>();
                     for (String email : emails) {
                         InlineKeyboardButton button = new InlineKeyboardButton(email);
-                        button.setCallbackData("letters " + ctx.update().getMessage().getMessageId() + 1 + " " + email);
+                        button.setCallbackData("letters " + sentMessageId + " " + email);
                         buttons.add(button);
                     }
 
@@ -193,5 +200,13 @@ public final class Bot extends AbilityBot {
 //                    silent.send(commands.get(abilityName).execute(user,  ctx.arguments()).getText(), ctx.chatId());
                 })
                 .build();
+    }
+
+    private void sendAll(List<org.bot.domain.Message> messages, Long userId) {
+        List<SendMessage> sendMessageList = TelegramBotInterface.sendMessageList(messages);
+        for (SendMessage sendMessage : sendMessageList) {
+            sendMessage.setChatId(userId);
+            silent.execute(sendMessage);
+        }
     }
 }

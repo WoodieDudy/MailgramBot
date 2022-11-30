@@ -10,6 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TelegramBotInterface {
+
+    public static List<SendMessage> sendMessageList(List<Message> messages) {
+        List<SendMessage> sendMessages = new ArrayList<>();
+        for (Message message : messages) {
+            sendMessages.add(sendMessage(message));
+        }
+        return sendMessages;
+    }
+
     public static SendMessage sendMessage(Message message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(message.getUserID());

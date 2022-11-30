@@ -25,7 +25,7 @@ public class Letter {
         return body;
     }
 
-    public String getSender() { // TODO filter cringe sender names
+    public String getSender() {
         return sender;
     }
 
@@ -114,14 +114,27 @@ public class Letter {
         return String.join("\n", letterLines);
     }
 
-    public String toString() { // TODO про это говорили что-то мудрое на леции?
-        return MessageFormat.format(
+
+    public String asString(int maxLen) {
+        String letterStr = MessageFormat.format(
     """
             Sender: {0}
             Subject: {1}
             Date: {2}
             
             {3}""",
+            sender, subject, date, body
+        );
+        return letterStr.substring(0, Math.min(letterStr.length(), maxLen)) + "\n...";
+    }
+    public String asString() {
+        return MessageFormat.format(
+            """
+                    Sender: {0}
+                    Subject: {1}
+                    Date: {2}
+                    
+                    {3}""",
             sender, subject, date, body
         );
     }

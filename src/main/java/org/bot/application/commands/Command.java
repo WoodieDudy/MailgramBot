@@ -3,6 +3,8 @@ package org.bot.application.commands;
 import org.bot.domain.Message;
 import org.bot.domain.User;
 
+import java.util.List;
+
 abstract public class Command {
     private final String alias;
     private final String description;

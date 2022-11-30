@@ -9,16 +9,17 @@ import org.bot.enums.MessagesTemplates;
 import org.bot.exceptions.SessionTimeExpiredException;
 import org.bot.infrastructure.interfaces.MailInterface;
 
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LettersListCommand extends Command {
     private final MailInterface mailInterface;
 
     record Args(String email, int lettersCount) {}
 
-    private Args parseArgs(String[] args) throws NumberFormatException {
-        String email = args[0];
-        int lettersCount = Integer.parseInt(args[1]);
+    private Args parseArgs(List<String> args) throws NumberFormatException {
+        String email = args.get(0);
+        int lettersCount = Integer.parseInt(args.get(1));
         return new Args(email, lettersCount);
     }
 
@@ -30,39 +31,37 @@ public class LettersListCommand extends Command {
         this.mailInterface = mailInterface;
     }
 
-    public Message execute(User user, String[] args) {
+    public List<Message> execute(User user, List<String> args) {
         return baseStateHandler(user, args);
     }
 
-    private Message baseStateHandler(User user, String[] rawArgs) {
+    private List<Message> baseStateHandler(User user, List<String> rawArgs) {
         Args args;
         try {
             args = parseArgs(rawArgs);
         } catch (Exception e) {
-            return new Message(MessagesTemplates.INCORRECT_ARGS.text, user.getId());
+            return List.of(new Message(MessagesTemplates.INCORRECT_ARGS.text, user.getId()));
         }
         Mailbox mailbox = user.getMailbox(args.email);
 
         if (mailbox == null) {
-            return new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, user.getId());
+            return List.of(new Message(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, user.getId()));
         }
 
         Letter[] letters;
         try {
             letters = this.mailInterface.readMessages(mailbox, args.lettersCount);
         } catch (SessionTimeExpiredException e) {
-            return new Message(MessagesTemplates.SESSION_EXPIRED.text, user.getId());
+            return List.of(new Message(MessagesTemplates.SESSION_EXPIRED.text, user.getId()));
         } catch (MessagingException e) {
-            return new Message(MessagesTemplates.ERROR_MESSAGE.text, user.getId());
+            return List.of(new Message(MessagesTemplates.ERROR_MESSAGE.text, user.getId()));
         }
 
-        // TODO: Telegraph для чтения писем мб.
-        StringJoiner joiner = new StringJoiner("\n\n\n");
+        // TODO: Telegraph for full letters
+        List<Message> lettersPreviews = new ArrayList<>();
         for (Letter letter : letters) {
-            joiner.add(letter.toString());
+            lettersPreviews.add(new Message(letter.asString(1000), user.getId()));
         }
-        String cutLetters = joiner.toString().substring(0, Math.min(joiner.toString().length(), 4090)) + "\n...";
-        System.out.println(cutLetters);
-        return new Message(cutLetters, user.getId());
+        return lettersPreviews;
     }
 }
