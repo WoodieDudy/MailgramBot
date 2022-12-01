@@ -1,6 +1,9 @@
 # MailgramBot
 <img src="assets/snippet.png">
 
+[![GitHub](https://badgen.net/badge/icon/telegram?icon=telegram&label=open)](https://t.me/CoolMailgramBot)
+![Build status](https://github.com/WoodieDudy/MailgramBot/actions/workflows/maven.yml/badge.svg?branch=cicd)
+
 ### MailgramBot is a email client for Telegram 
 
 Tasks:
