@@ -28,18 +28,19 @@ public class BotLogicTest {
         }
     }
 
-    User user = new User(1);
     MailInterface mailInterface = new DummyMailInterface();
 
     @Test
     public void testGetLettersCommandUnAuthed() {
+        User user = new User(1);
         Command lettersListCommand = new LettersListCommand(mailInterface);
         Message message = lettersListCommand.execute(user, new String[]{"test@test.com", "3"});
-        assertEquals(message.getText(), MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text);
+        assertEquals(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, message.getText());
     }
 
     @Test
     public void testAuthCommandNotValid() {
+        User user = new User(1);
         Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
         Message message = auth.execute(user, new String[]{"test@test.com", "123"});
         assertEquals(MessagesTemplates.AUTH_ERROR_MESSAGE.text, message.getText());
@@ -47,6 +48,7 @@ public class BotLogicTest {
 
     @Test
     public void testAuthCommandValid() {
+        User user = new User(1);
         Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
         Message message = auth.execute(user, new String[]{"test@test.com", "amogus"});
         assertEquals(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text, message.getText());
@@ -54,6 +56,7 @@ public class BotLogicTest {
 
     @Test
     public void testGetLettersCommandAuthed() {
+        User user = new User(1);
         Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
         auth.execute(user, new String[]{"test@test.com", "amogus"});
 
@@ -64,7 +67,8 @@ public class BotLogicTest {
 
     @Test
     public void testSessionExpired() throws InterruptedException {
-        Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
+        User user = new User(1);
+        Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(0));
         auth.execute(user, new String[]{"test@test.com", "amogus"});
         Command lettersListCommand = new LettersListCommand(mailInterface);
 
