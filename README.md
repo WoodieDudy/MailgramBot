@@ -28,3 +28,9 @@ $ mvn clean test
 ```sh
 $ mvn clean compile exec:java
 ```
+
+### Running with docker
+```sh
+$ docker build -t mailgrambot .
+$ docker run -it mailgrambot
+```
