@@ -41,3 +41,6 @@ build/
 ### Custom ###
 .idea
 *.class
+
+### Secret ###
+/src/main/resources/config.properties
