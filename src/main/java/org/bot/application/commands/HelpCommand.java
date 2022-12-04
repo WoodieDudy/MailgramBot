@@ -1,14 +1,16 @@
-package org.bot.domain.commands;
+package org.bot.application.commands;
 
 import org.bot.domain.Message;
 import org.bot.domain.User;
+
+import java.util.List;
 
 public class HelpCommand extends Command {
     String helpMessage;
 
     public HelpCommand() {
         super(
-            "/help",
+            "help",
             "- get help"
         );
     }
@@ -16,6 +18,7 @@ public class HelpCommand extends Command {
     public void generateHelpMessage(Command[] commands) {
         StringBuilder helpMessageBuilder = new StringBuilder();
         for (Command command : commands) {
+            helpMessageBuilder.append("/");
             helpMessageBuilder.append(command.getAlias());
             helpMessageBuilder.append(" ");
             helpMessageBuilder.append(command.getDescription());
@@ -24,7 +27,7 @@ public class HelpCommand extends Command {
         helpMessage = helpMessageBuilder.toString();
     }
 
-    public Message execute(User user, String[] args) {
-        return new Message(helpMessage);
+    public List<Message> execute(User user, List<String> args) {
+        return List.of(new Message(helpMessage, user.getId()));
     }
 }

@@ -31,8 +31,9 @@ public enum MessagesTemplates {
 
     ERROR_MESSAGE("Что-то пошло не так."),
     SESSION_EXPIRED("Сессия истекла, введите /auth для повторной авторизации"),
-    INCORRECT_ARGS("Некорректные параметры команды, введите /help для получения справки");
+    INCORRECT_ARGS("Некорректные параметры команды, введите /help для получения справки"),
 
+    CHOOSE_EMAIL("Выберите почту");
     public final String text;
 
     MessagesTemplates(String text) {
