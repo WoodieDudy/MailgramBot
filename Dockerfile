@@ -9,3 +9,4 @@ FROM eclipse-temurin:17.0.5_8-jre-ubi9-minimal
 
 COPY --from=build /app/target/MailgramBot-1.0-SNAPSHOT-jar-with-dependencies.jar /app/bot.jar
 ENTRYPOINT ["java", "-jar", "/app/bot.jar"]
+CMD ["/app/config.properties"]

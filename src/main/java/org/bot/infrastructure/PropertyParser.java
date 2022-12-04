@@ -6,7 +6,7 @@ import java.util.Properties;
 
 
 public class PropertyParser {
-    public static Properties getProperties(String path) throws IOException {
+    public static Properties parseProperties(String path) throws IOException {
         FileInputStream fileInputStream;
         Properties properties = new Properties();
 

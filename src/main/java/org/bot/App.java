@@ -16,7 +16,8 @@ public class App {
     public static void main(String[] args) throws IOException {
         MailInterface mailInterface = new JakartaMailInterface();
 
-        Properties properties = PropertyParser.getProperties("src/main/resources/config.properties");
+        // src/main/resources/config.properties
+        Properties properties = PropertyParser.parseProperties(args[0]);
 
         Bot bot = new Bot(
             mailInterface,
