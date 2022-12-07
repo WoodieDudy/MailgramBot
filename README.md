@@ -1,5 +1,5 @@
 # MailgramBot
-<img src="assets/snippet.png">
+<img src="assets/snippet.png" alt="snippet.png">
 
 [![GitHub](https://badgen.net/badge/icon/telegram?icon=telegram&label=open)](https://t.me/CoolMailgramBot)
 ![Build status](https://github.com/WoodieDudy/MailgramBot/actions/workflows/maven.yml/badge.svg?branch=cicd)
@@ -9,6 +9,8 @@
 Tasks:
 1. Implemented a conversation with the user in the console, configured the processing of incorrect commands and switching "states" (states)
 necessary to determine the currently available tools of the bot.
+2. States replaced by command classes for each command. Added base mail functional.
+3. Bot moved to Telegram (using Activity Bot) with buttons. Deployed.
 
 # About.
 Java-based Telegram bot that provides the functionality of receiving emails.
