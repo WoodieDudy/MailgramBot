@@ -17,6 +17,7 @@ If you want to know more about options you can use /help.
 ## Clone the repo
 ```sh
 $ git clone https://github.com/WoodieDudy/MailgramBot
+$ cd MailgramBot
 ```
 
 ### Running test with maven

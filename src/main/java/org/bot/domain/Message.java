@@ -10,8 +10,8 @@ import java.util.Objects;
 
 public class Message {
     private String text = null;
-    private Integer messageID = null;
-    private final Long userID;
+    private Integer messageId = null;
+    private final Long userId;
     private List<InlineKeyboardButton> buttons = null;
 
 
@@ -19,12 +19,14 @@ public class Message {
         return text;
     }
 
-    public Long getUserID() {
-        return userID;
+    public Long getUserId() {
+        return userId;
     }
-    public Integer getMessageID() {
-        return messageID;
+
+    public Integer getMessageId() {
+        return messageId;
     }
+
     public List<InlineKeyboardButton> getButtons() {
         return buttons;
     }
@@ -45,28 +47,27 @@ public class Message {
         return inlineKeyboardMarkup;
     }
 
-    public Message(String text, Long userID) {
+    public Message(String text, Long userId) {
         this.text = text;
-        this.userID = userID;
+        this.userId = userId;
     }
 
-    // for sendMessage from BotInterface
-    public Message(String text, Long userID, List<InlineKeyboardButton> buttons) {
+    public Message(String text, Long userId, List<InlineKeyboardButton> buttons) {
         this.text = text;
-        this.userID = userID;
+        this.userId = userId;
         this.buttons = buttons;
     }
 
-    // for editMessage from BotInterface
-    public Message(Integer messageID, Long userID, List<InlineKeyboardButton> buttons) {
-        this.messageID = messageID;
-        this.userID = userID;
+    public Message(Integer messageId, Long userId, List<InlineKeyboardButton> buttons) {
+        this.messageId = messageId;
+        this.userId = userId;
         this.buttons = buttons;
     }
-    public Message(String text, Integer messageID, Long userID, List<InlineKeyboardButton> buttons) {
+
+    public Message(String text, Integer messageId, Long userId, List<InlineKeyboardButton> buttons) {
         this.text = text;
-        this.messageID = messageID;
-        this.userID = userID;
+        this.messageId = messageId;
+        this.userId = userId;
         this.buttons = buttons;
     }
 
@@ -79,6 +80,6 @@ public class Message {
             return false;
         }
         Message message = (Message) object;
-        return this.text.equals(message.text) && Objects.equals(this.userID, message.userID);
+        return text.equals(message.text) && Objects.equals(userId, message.userId);
     }
 }

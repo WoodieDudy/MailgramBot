@@ -21,7 +21,7 @@ public class TelegramBotInterface {
 
     public static SendMessage sendMessage(Message message) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(message.getUserID());
+        sendMessage.setChatId(message.getUserId());
         sendMessage.setText(message.getText());
         sendMessage.setReplyMarkup(message.getMarkup());
         return sendMessage;
@@ -33,16 +33,16 @@ public class TelegramBotInterface {
         if (message.getText() != null) {
             EditMessageText editText = new EditMessageText();
             editText.setText(message.getText());
-            editText.setChatId(message.getUserID());
-            editText.setMessageId(message.getMessageID());
+            editText.setChatId(message.getUserId());
+            editText.setMessageId(message.getMessageId());
             editors.add(editText);
         }
 
         if (message.getButtons() != null) {
             EditMessageReplyMarkup editReplyMarkup = new EditMessageReplyMarkup();
             editReplyMarkup.setReplyMarkup(message.getMarkup());
-            editReplyMarkup.setChatId(message.getUserID());
-            editReplyMarkup.setMessageId(message.getMessageID());
+            editReplyMarkup.setChatId(message.getUserId());
+            editReplyMarkup.setMessageId(message.getMessageId());
             editors.add(editReplyMarkup);
         }
 
