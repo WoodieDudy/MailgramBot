@@ -57,7 +57,7 @@ public class LettersListCommand extends Command {
             return List.of(new Message(MessagesTemplates.ERROR_MESSAGE.text, user.getId()));
         }
 
-        // TODO: Telegraph for full letters
+        //TODO: Telegraph for full letters
         List<Message> lettersPreviews = new ArrayList<>();
         for (Letter letter : letters) {
             lettersPreviews.add(new Message(letter.asString(1000), user.getId()));
