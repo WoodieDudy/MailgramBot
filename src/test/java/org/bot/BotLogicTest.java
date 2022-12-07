@@ -26,60 +26,74 @@ public class BotLogicTest {
 
         @Override
         public boolean isCredentialsCorrect(Mailbox mailbox) {
-            return mailbox.getEmail().equals("test@test.com") && mailbox.getPassword().equals("amogus");
+            return mailbox.getEmail().equals("johndoe@test.com") && mailbox.getPassword().equals("password");
         }
     }
 
     MailInterface mailInterface = new DummyMailInterface();
 
     @Test
-    public void testGetLettersCommandUnAuthed() {
+    public void testGetLettersCommandNonAuthed() {
         User user = new User(1L);
         Command lettersListCommand = new LettersListCommand(mailInterface);
-        List<String> args = Arrays.asList("test@test.com", "3");
+        List<String> args = Arrays.asList("johndoe@test.com", "3");
         Message message = lettersListCommand.execute(user, args).get(0);
-        assertEquals(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, message.getText());
+
+        String expectedResult = MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text;
+        String actualResult = message.getText();
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     public void testAuthCommandNotValid() {
         User user = new User(1L);
         Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
-        List<String> args = Arrays.asList("test@test.com", "123");
+        List<String> args = Arrays.asList("johndoe@test.com", "wrongpassword");
         Message message = auth.execute(user, args).get(0);
-        assertEquals(MessagesTemplates.AUTH_ERROR_MESSAGE.text, message.getText());
+
+        String expectedResult = MessagesTemplates.AUTH_ERROR_MESSAGE.text;
+        String actualResult = message.getText();
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     public void testAuthCommandValid() {
         User user = new User(1L);
         Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
-        List<String> args = Arrays.asList("test@test.com", "amogus");
+        List<String> args = Arrays.asList("johndoe@test.com", "password");
         Message message = auth.execute(user, args).get(0);
-        assertEquals(MessagesTemplates.AUTH_SUCCESS_MESSAGE.text, message.getText());
+
+        String expectedResult = MessagesTemplates.AUTH_SUCCESS_MESSAGE.text;
+        String actualResult = message.getText();
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     public void testGetLettersCommandAuthed() {
         User user = new User(1L);
-        Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(1));
         Command lettersListCommand = new LettersListCommand(mailInterface);
-        List<String> args = Arrays.asList("test@test.com", "amogus");
+        List<String> args = Arrays.asList("johndoe@test.com", "password");
         Message message = lettersListCommand.execute(user, args).get(0);
-        assertNotEquals(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, message.getText());
+
+        String expectedResult = MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text;
+        String actualResult = message.getText();
+        assertNotEquals(expectedResult, actualResult);
     }
 
     @Test
     public void testSessionExpired() throws InterruptedException {
         User user = new User(1L);
         Command auth = new AuthCommand(mailInterface, Duration.ofSeconds(0));
-        List<String> args = Arrays.asList("test@test.com", "amogus");
+        List<String> args = Arrays.asList("johndoe@test.com", "password");
         auth.execute(user, args);
 
         Command lettersListCommand = new LettersListCommand(mailInterface);
         TimeUnit.SECONDS.sleep(1);
-        args = Arrays.asList("test@test.com", "1");
+        args = Arrays.asList("johndoe@test.com", "1");
         Message message = lettersListCommand.execute(user, args).get(0);
-        assertEquals(MessagesTemplates.SESSION_EXPIRED.text, message.getText());
+
+        String expectedResult = MessagesTemplates.SESSION_EXPIRED.text;
+        String actualResult = message.getText();
+        assertEquals(expectedResult, actualResult);
     }
 }
