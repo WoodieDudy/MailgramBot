@@ -1,7 +1,9 @@
 package org.bot.infrastructure;
 
 import org.bot.domain.Message;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSerializable;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -10,6 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TelegramBotInterface {
+    public static void setBotAction(Long chatId) {
+        SendChatAction sendChatAction = new SendChatAction();
+        sendChatAction.setChatId(chatId);
+        sendChatAction.setAction(ActionType.TYPING);
+    }
 
     public static List<SendMessage> sendMessageList(List<Message> messages) {
         List<SendMessage> sendMessages = new ArrayList<>();
