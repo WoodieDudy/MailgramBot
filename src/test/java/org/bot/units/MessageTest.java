@@ -21,19 +21,19 @@ public class MessageTest {
     }
 
     @Test
-    public void testGetUserID() {
-        Long expectedUserID = 1L;
-        Message message = new Message("Hello, World!", expectedUserID);
-        Long actualUserID = message.getUserID();
-        assertEquals(expectedUserID, actualUserID);
+    public void testGetUserId() {
+        Long expectedUserId = 1L;
+        Message message = new Message("Hello, World!", expectedUserId);
+        Long actualUserId = message.getUserId();
+        assertEquals(expectedUserId, actualUserId);
     }
 
     @Test
-    public void testGetMessageID() {
-        Integer expectedMessageID = 1;
-        Message message = new Message(expectedMessageID, 1L, new ArrayList<>());
-        Integer actualMessageID = message.getMessageID();
-        assertEquals(expectedMessageID, actualMessageID);
+    public void testGetMessageId() {
+        Integer expectedMessageId = 1;
+        Message message = new Message(expectedMessageId, 1L, new ArrayList<>());
+        Integer actualMessageId = message.getMessageId();
+        assertEquals(expectedMessageId, actualMessageId);
     }
 
     @Test
