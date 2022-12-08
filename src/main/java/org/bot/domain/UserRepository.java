@@ -1,7 +1,5 @@
 package org.bot.domain;
 
-import org.bot.exceptions.IdNotFoundException;
-
 import java.util.HashMap;
 
 public class UserRepository {
@@ -14,14 +12,6 @@ public class UserRepository {
     public void addUser(User user) {
         Long id = user.getId();
         userRepository.put(id, user);
-    }
-
-    public void deleteUserById(Long id) throws IdNotFoundException {
-        if (userRepository.containsKey(id)) {
-            userRepository.remove(id);
-            return;
-        }
-        throw new IdNotFoundException("There is no such identifier in the repository.");
     }
 
     public User getUserById(Long id) {
