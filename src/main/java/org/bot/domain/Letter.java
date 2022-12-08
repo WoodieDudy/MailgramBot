@@ -25,7 +25,7 @@ public class Letter {
         return body;
     }
 
-    public String getSender() { // TODO filter cringe sender names
+    public String getSender() {
         return sender;
     }
 
@@ -33,7 +33,7 @@ public class Letter {
         return date;
     }
 
-    public static Letter fromMailMessage(Message message){
+    public static Letter fromMailMessage(Message message) {
         Letter letter = new Letter();
         letter.subject = parseSubject(message);
         letter.body = parseBody(message);
@@ -60,7 +60,7 @@ public class Letter {
         }
     }
 
-    private static String parseBody(Message message){
+    private static String parseBody(Message message) {
         try {
             String result = "";
             if (message.isMimeType("text/plain")) {
@@ -68,19 +68,16 @@ public class Letter {
             } else if (message.isMimeType("multipart/*")) {
                 MimeMultipart mimeMultipart = (MimeMultipart) message.getContent();
                 result = getTextFromMimeMultipart(mimeMultipart);
-            }
-            else if (message.isMimeType("text/html")) {
+            } else if (message.isMimeType("text/html")) {
                 String html = (String) message.getContent();
                 result = Jsoup.parse(html).text();
-            }
-            else {
+            } else {
                 System.out.println("Unknown message type " + message.getContentType());
             }
             result = result.replaceAll("[\r\n\s ]{2,}", "\n");
             result = result.replaceAll("[\t\s ]{2,}", "\s");
             return result;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -94,7 +91,7 @@ public class Letter {
         }
     }
 
-    private static String getTextFromMimeMultipart(MimeMultipart mimeMultipart)  throws MessagingException, IOException{
+    private static String getTextFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
         ArrayList<String> letterLines = new ArrayList<>();
         int count = mimeMultipart.getCount();
         for (int i = 0; i < count; i++) {
@@ -102,27 +99,40 @@ public class Letter {
             if (bodyPart.isMimeType("text/plain")) {
                 String text = bodyPart.getContent().toString();
                 letterLines.add(text);
-//                break; // without break same text appears twice in my tests
             } else if (bodyPart.isMimeType("text/html")) {
                 String html = (String) bodyPart.getContent();
                 String text = Jsoup.parse(html).text();
                 letterLines.add(text);
-            } else if (bodyPart.getContent() instanceof MimeMultipart){
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
                 letterLines.add(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
             }
         }
         return String.join("\n", letterLines);
     }
 
-    public String toString() { // TODO про это говорили что-то мудрое на леции?
+
+    public String asString(int maxLen) {
+        String letterStr = MessageFormat.format(
+                """
+                        Sender: {0}
+                        Subject: {1}
+                        Date: {2}
+                                    
+                        {3}""",
+                sender, subject, date, body
+        );
+        return letterStr.substring(0, Math.min(letterStr.length(), maxLen)) + "\n...";
+    }
+
+    public String asString() {
         return MessageFormat.format(
-    """
-            Sender: {0}
-            Subject: {1}
-            Date: {2}
-            
-            {3}""",
-            sender, subject, date, body
+                """
+                        Sender: {0}
+                        Subject: {1}
+                        Date: {2}
+                                            
+                        {3}""",
+                sender, subject, date, body
         );
     }
 }

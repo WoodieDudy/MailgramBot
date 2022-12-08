@@ -1,23 +1,21 @@
 package org.bot.domain;
 
-import org.bot.enums.UserState;
 import org.bot.exceptions.EmailNotFoundException;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class User {
-    private final Integer id;
-    private UserState state;
+    private final Long id;
     private final HashMap<String, Mailbox> mailboxes;
-    private String tempEmail;
+    private String tempEmail = null;
 
-    public User(Integer id) {
+    public User(Long id) {
         this.id = id;
         mailboxes = new HashMap<>();
-        state = UserState.NOT_AUTHED;
     }
 
-    public Integer getID() {
+    public Long getId() {
         return id;
     }
 
@@ -26,26 +24,24 @@ public class User {
     }
 
     public void removeMailBox(String email) throws EmailNotFoundException {
-        if (mailboxes.containsKey(email)) {
-            mailboxes.remove(email);
+        if (!mailboxes.containsKey(email)) {
+            throw new EmailNotFoundException("Email not found.");
         }
-        throw new EmailNotFoundException("Email not found.");
+        mailboxes.remove(email);
     }
 
     public Mailbox getMailbox(String email) {
         return mailboxes.get(email);
     }
 
-    public UserState getState() {
-        return state;
-    }
-    public void changeState(UserState state) {
-        this.state = state;
+    public List<String> getAllEmails() {
+        return List.copyOf(mailboxes.keySet());
     }
 
     public void setTempEmail(String email) {
         tempEmail = email;
     }
+
     public String getTempEmail() {
         return tempEmail;
     }

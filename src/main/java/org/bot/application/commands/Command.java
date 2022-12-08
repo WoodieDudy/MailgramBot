@@ -1,7 +1,9 @@
-package org.bot.domain.commands;
+package org.bot.application.commands;
 
 import org.bot.domain.Message;
 import org.bot.domain.User;
+
+import java.util.List;
 
 abstract public class Command {
     private final String alias;
@@ -20,5 +22,5 @@ abstract public class Command {
         return description;
     }
 
-    public abstract Message execute(User user, String[] args);
+    public abstract List<Message> execute(User user, List<String> args);
 }

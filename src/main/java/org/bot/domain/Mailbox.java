@@ -31,4 +31,16 @@ public class Mailbox {
     public void updateAuthTime() {
         this.expiresAt = Instant.now().plus(sessionDuration);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
+        Mailbox mailbox = (Mailbox) obj;
+        return email.equals(mailbox.email);
+    }
 }

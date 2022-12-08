@@ -2,8 +2,8 @@ package org.bot.enums;
 
 public enum MessagesTemplates {
 
-    START_MESSAGE("Привет! Я Mailgram bot, я помогу тебе удобно пользоваться почтой без мобильного клиента " +
-            "посредством Telegram. Чтобы узнать, что я умею, напиши /help"),
+    START_MESSAGE("Привет \uD83D\uDC4B! Я Mailgram bot, я помогу тебе удобно пользоваться почтой без " +
+            "мобильного клиента посредством Telegram. Чтобы узнать, что я умею, напиши /help"),
     DEFAULT_MESSAGE("Я не понимаю тебя. Чтобы узнать, что я умею, напиши /help"),
     NOT_AUTH_LIST_IS_UNAVAILABLE("Невозможно получить список писем неавторизованного пользователя. " +
             "Воспользуйся командой /auth, чтобы залогиниться."),
@@ -31,8 +31,9 @@ public enum MessagesTemplates {
 
     ERROR_MESSAGE("Что-то пошло не так."),
     SESSION_EXPIRED("Сессия истекла, введите /auth для повторной авторизации"),
-    INCORRECT_ARGS("Некорректные параметры команды, введите /help для получения справки");
+    INCORRECT_ARGS("Некорректные параметры команды, введите /help для получения справки"),
 
+    CHOOSE_EMAIL("Выберите почту");
     public final String text;
 
     MessagesTemplates(String text) {
