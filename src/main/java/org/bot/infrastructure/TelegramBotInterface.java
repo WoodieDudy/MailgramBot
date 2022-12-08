@@ -1,7 +1,9 @@
 package org.bot.infrastructure;
 
 import org.bot.domain.Message;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSerializable;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -10,6 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TelegramBotInterface {
+    public static void setBotAction(Long chatId) {
+        SendChatAction sendChatAction = new SendChatAction();
+        sendChatAction.setChatId(chatId);
+        sendChatAction.setAction(ActionType.TYPING);
+    }
 
     public static List<SendMessage> sendMessageList(List<Message> messages) {
         List<SendMessage> sendMessages = new ArrayList<>();
@@ -21,7 +28,7 @@ public class TelegramBotInterface {
 
     public static SendMessage sendMessage(Message message) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(message.getUserID());
+        sendMessage.setChatId(message.getUserId());
         sendMessage.setText(message.getText());
         sendMessage.setReplyMarkup(message.getMarkup());
         return sendMessage;
@@ -33,16 +40,16 @@ public class TelegramBotInterface {
         if (message.getText() != null) {
             EditMessageText editText = new EditMessageText();
             editText.setText(message.getText());
-            editText.setChatId(message.getUserID());
-            editText.setMessageId(message.getMessageID());
+            editText.setChatId(message.getUserId());
+            editText.setMessageId(message.getMessageId());
             editors.add(editText);
         }
 
         if (message.getButtons() != null) {
             EditMessageReplyMarkup editReplyMarkup = new EditMessageReplyMarkup();
             editReplyMarkup.setReplyMarkup(message.getMarkup());
-            editReplyMarkup.setChatId(message.getUserID());
-            editReplyMarkup.setMessageId(message.getMessageID());
+            editReplyMarkup.setChatId(message.getUserId());
+            editReplyMarkup.setMessageId(message.getMessageId());
             editors.add(editReplyMarkup);
         }
 

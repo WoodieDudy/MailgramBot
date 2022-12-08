@@ -7,14 +7,19 @@ import org.bot.enums.MessagesTemplates;
 import org.bot.infrastructure.interfaces.MailInterface;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AuthCommand extends Command {
     private final MailInterface mailInterface;
     private final Duration sessionDuration;
-    record Args(String email, String password) {}
+
+    record Args(String email, String password) {
+    }
+
     private Args parseArgs(List<String> args) {
+        if (args.size() != 2) {
+            throw new IllegalArgumentException("Wrong args number");
+        }
         String email = args.get(0);
         String password = args.get(1);
         if (!email.contains("@")) {
@@ -25,8 +30,8 @@ public class AuthCommand extends Command {
 
     public AuthCommand(MailInterface mailInterface, Duration sessionDuration) {
         super(
-            "auth",
-            "<email> <password> - authenticate to mailbox"
+                "auth",
+                "<email> <password> - authenticate to mailbox"
         );
         this.mailInterface = mailInterface;
         this.sessionDuration = sessionDuration;
@@ -36,8 +41,7 @@ public class AuthCommand extends Command {
         Args parsedArgs;
         try {
             parsedArgs = parseArgs(args);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return List.of(new Message(MessagesTemplates.AUTH_INCORRECT_MESSAGE.text, user.getId()));
         }
         Mailbox mailbox = new Mailbox(parsedArgs.email(), parsedArgs.password(), sessionDuration);
