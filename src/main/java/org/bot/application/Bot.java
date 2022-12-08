@@ -20,6 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
 import java.time.Duration;
 import java.util.*;
@@ -59,9 +60,13 @@ public final class Bot extends AbilityBot {
         return 123456789;
     }
 
+
+
     @Override
     public void onUpdateReceived(Update update) {
+        System.out.println("345");
         super.onUpdateReceived(update);
+        // print webapp info
         if (!update.hasCallbackQuery()) {
             return;
         }
@@ -198,6 +203,36 @@ public final class Bot extends AbilityBot {
                     }
 
 //                    silent.send(commands.get(abilityName).execute(user,  ctx.arguments()).getText(), ctx.chatId());
+                })
+                .build();
+    }
+
+    public Ability test() {
+        String abilityName = "test";
+        return Ability
+                .builder()
+                .name(abilityName)
+                .info("Prints letters")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    System.out.println(ctx.chatId());
+                    User user = userRepository.getUserById(ctx.chatId());
+
+                    WebAppInfo webAppInfo = new WebAppInfo();
+                    webAppInfo.setUrl("https://9931-94-51-238-54.eu.ngrok.io");
+                    InlineKeyboardButton button = new InlineKeyboardButton("test");
+                    button.setWebApp(webAppInfo);
+
+                    List<InlineKeyboardButton> buttons = new ArrayList<>();
+                    buttons.add(button);
+
+                    org.bot.domain.Message message = new org.bot.domain.Message(
+                        "test",
+                        ctx.chatId(),
+                        buttons
+                    );
+                    silent.execute(TelegramBotInterface.sendMessage(message));
                 })
                 .build();
     }
