@@ -2,7 +2,7 @@ package org.bot.enums;
 
 public enum MessagesTemplates {
 
-    START_MESSAGE("Привет \uD83D\uDC4B! Я Mailgram bot, я помогу тебе удобно пользоваться почтой без " +
+    START_MESSAGE("Привет! Я Mailgram bot, я помогу тебе удобно пользоваться почтой без " +
             "мобильного клиента посредством Telegram. Чтобы узнать, что я умею, напиши /help"),
     DEFAULT_MESSAGE("Я не понимаю тебя. Чтобы узнать, что я умею, напиши /help"),
     NOT_AUTH_LIST_IS_UNAVAILABLE("Невозможно получить список писем неавторизованного пользователя. " +
