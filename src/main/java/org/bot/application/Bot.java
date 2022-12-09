@@ -19,7 +19,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
 import java.time.Duration;
@@ -64,9 +67,10 @@ public final class Bot extends AbilityBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        System.out.println("345");
         super.onUpdateReceived(update);
         // print webapp info
+        System.out.println(update.getMessage().getWebAppData().getData());
+
         if (!update.hasCallbackQuery()) {
             return;
         }
@@ -220,19 +224,29 @@ public final class Bot extends AbilityBot {
                     User user = userRepository.getUserById(ctx.chatId());
 
                     WebAppInfo webAppInfo = new WebAppInfo();
-                    webAppInfo.setUrl("https://9931-94-51-238-54.eu.ngrok.io");
-                    InlineKeyboardButton button = new InlineKeyboardButton("test");
-                    button.setWebApp(webAppInfo);
+                    webAppInfo.setUrl("https://e14f-40-87-132-117.eu.ngrok.io");
 
-                    List<InlineKeyboardButton> buttons = new ArrayList<>();
-                    buttons.add(button);
+                    ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+                    replyKeyboardMarkup.setSelective(true);
+                    replyKeyboardMarkup.setResizeKeyboard(true);
+                    replyKeyboardMarkup.setOneTimeKeyboard(false);
 
-                    org.bot.domain.Message message = new org.bot.domain.Message(
-                        "test",
-                        ctx.chatId(),
-                        buttons
-                    );
-                    silent.execute(TelegramBotInterface.sendMessage(message));
+                    List<KeyboardRow> keyboard = new ArrayList<>();
+
+                    KeyboardRow keyboardFirstRow = new KeyboardRow();
+
+                    KeyboardButton btn = new KeyboardButton("test");
+                    btn.setWebApp(webAppInfo);
+                    keyboardFirstRow.add(btn);
+
+                    keyboard.add(keyboardFirstRow);
+                    replyKeyboardMarkup.setKeyboard(keyboard);
+
+                    SendMessage sendMessage = new SendMessage();
+                    sendMessage.setChatId(ctx.chatId());
+                    sendMessage.setText("test");
+                    sendMessage.setReplyMarkup(replyKeyboardMarkup);
+                    silent.execute(sendMessage);
                 })
                 .build();
     }
