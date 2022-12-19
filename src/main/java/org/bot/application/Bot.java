@@ -63,52 +63,106 @@ public final class Bot extends AbilityBot {
         return 123456789;
     }
 
-
+//    @Override
+//    public void onUpdateReceived(Update update) {
+//        super.onUpdateReceived(update);
+//        // print webapp info
+//        System.out.println(update.getMessage().getWebAppData().getData());
+//
+//        if (!update.hasCallbackQuery()) {
+//            return;
+//        }
+//        User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
+//        System.out.println(update.getCallbackQuery().getData());
+//
+//        String callbackData = update.getCallbackQuery().getData();
+//        String[] callbackDataParts = callbackData.split(" ");
+//        String commandAlias = callbackDataParts[0];
+//        String fromMessageId = callbackDataParts[1];
+//        if (commandAlias.equals("letters")) {
+//            user.setTempEmail(callbackDataParts[2]);
+//
+//            List<InlineKeyboardButton> buttons = new ArrayList<>();
+//            for (int lettersNumber: new int[]{1, 2, 4}) {
+//                InlineKeyboardButton button = new InlineKeyboardButton(String.valueOf(lettersNumber));
+//                button.setCallbackData("chooseNum " + fromMessageId + " " + lettersNumber);
+//                buttons.add(button);
+//            }
+//
+//            System.out.println(fromMessageId);
+//
+//            org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
+//                    "Выберите количество писем",
+//                    Integer.parseInt(fromMessageId),
+//                    update.getCallbackQuery().getFrom().getId(),
+//                    buttons
+//            );
+//
+//            List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
+//
+//            for (BotApiMethodSerializable botApiMethodSerializable : executable) {
+//                silent.execute(botApiMethodSerializable);
+//            }
+//        }
+//        else if (commandAlias.equals("chooseNum")) {
+//            List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
+//            sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
+//        }
+//    }
 
     @Override
     public void onUpdateReceived(Update update) {
         super.onUpdateReceived(update);
         // print webapp info
-        System.out.println(update.getMessage().getWebAppData().getData());
 
-        if (!update.hasCallbackQuery()) {
-            return;
-        }
-        User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
-        System.out.println(update.getCallbackQuery().getData());
+        if (update.hasCallbackQuery()) {
+            User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
+            System.out.println(update.getCallbackQuery().getData());
 
-        String callbackData = update.getCallbackQuery().getData();
-        String[] callbackDataParts = callbackData.split(" ");
-        String commandAlias = callbackDataParts[0];
-        String fromMessageId = callbackDataParts[1];
-        if (commandAlias.equals("letters")) {
-            user.setTempEmail(callbackDataParts[2]);
+            String callbackData = update.getCallbackQuery().getData();
+            String[] callbackDataParts = callbackData.split(" ");
+            String commandAlias = callbackDataParts[0];
+            String fromMessageId = callbackDataParts[1];
 
-            List<InlineKeyboardButton> buttons = new ArrayList<>();
-            for (int lettersNumber: new int[]{1, 2, 4}) {
-                InlineKeyboardButton button = new InlineKeyboardButton(String.valueOf(lettersNumber));
-                button.setCallbackData("chooseNum " + fromMessageId + " " + lettersNumber);
-                buttons.add(button);
+            if (commandAlias.equals("letters")) {
+                user.setTempEmail(callbackDataParts[2]);
+
+                List<InlineKeyboardButton> buttons = new ArrayList<>();
+                for (int lettersNumber: new int[]{1, 2, 4}) {
+                    InlineKeyboardButton button = new InlineKeyboardButton(String.valueOf(lettersNumber));
+                    button.setCallbackData("chooseNum " + fromMessageId + " " + lettersNumber);
+                    buttons.add(button);
+                }
+
+                System.out.println(fromMessageId);
+
+                org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
+                        "Выберите количество писем",
+                        Integer.parseInt(fromMessageId),
+                        update.getCallbackQuery().getFrom().getId(),
+                        buttons
+                );
+
+                List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
+
+                for (BotApiMethodSerializable botApiMethodSerializable : executable) {
+                    silent.execute(botApiMethodSerializable);
+                }
             }
-
-            System.out.println(fromMessageId);
-
-            org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
-                "Выберите количество писем",
-               Integer.parseInt(fromMessageId),
-               update.getCallbackQuery().getFrom().getId(),
-               buttons
-            );
-
-            List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
-
-            for (BotApiMethodSerializable botApiMethodSerializable : executable) {
-                silent.execute(botApiMethodSerializable);
+            else if (commandAlias.equals("chooseNum")) {
+                List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
+                sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
             }
         }
-        else if (commandAlias.equals("chooseNum")) {
-            List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
-            sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
+
+        if (update.getMessage().getWebAppData() != null) {
+            User user = userRepository.getUserById(update.getMessage().getChatId());
+
+            String callbackData = update.getMessage().getWebAppData().getData();
+            String[] callbackDataParts = callbackData.split(" ");
+            String email = callbackDataParts[0];
+            String password = callbackDataParts[1];
+            sendAll(commands.get("auth").execute(user, List.of(email, password)), user.getId());
         }
     }
 
@@ -129,21 +183,6 @@ public final class Bot extends AbilityBot {
                 .builder()
                 .name(abilityName)
                 .info("Returns help message")
-                .locality(ALL)
-                .privacy(PUBLIC)
-                .action(ctx -> {
-                    User user = userRepository.getUserById(ctx.chatId());
-                    sendAll(commands.get(abilityName).execute(user, List.of(ctx.arguments())), ctx.chatId());
-                })
-                .build();
-    }
-
-    public Ability auth() {
-        String abilityName = "auth";
-        return Ability
-                .builder()
-                .name(abilityName)
-                .info("Auth user")
                 .locality(ALL)
                 .privacy(PUBLIC)
                 .action(ctx -> {
@@ -211,8 +250,8 @@ public final class Bot extends AbilityBot {
                 .build();
     }
 
-    public Ability test() {
-        String abilityName = "test";
+    public Ability auth() {
+        String abilityName = "auth";
         return Ability
                 .builder()
                 .name(abilityName)
@@ -224,7 +263,7 @@ public final class Bot extends AbilityBot {
                     User user = userRepository.getUserById(ctx.chatId());
 
                     WebAppInfo webAppInfo = new WebAppInfo();
-                    webAppInfo.setUrl("https://e14f-40-87-132-117.eu.ngrok.io");
+                    webAppInfo.setUrl("https://228f-5-165-31-177.eu.ngrok.io");
 
                     ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
                     replyKeyboardMarkup.setSelective(true);
@@ -235,7 +274,7 @@ public final class Bot extends AbilityBot {
 
                     KeyboardRow keyboardFirstRow = new KeyboardRow();
 
-                    KeyboardButton btn = new KeyboardButton("test");
+                    KeyboardButton btn = new KeyboardButton("Sign in");
                     btn.setWebApp(webAppInfo);
                     keyboardFirstRow.add(btn);
 
@@ -244,7 +283,6 @@ public final class Bot extends AbilityBot {
 
                     SendMessage sendMessage = new SendMessage();
                     sendMessage.setChatId(ctx.chatId());
-                    sendMessage.setText("test");
                     sendMessage.setReplyMarkup(replyKeyboardMarkup);
                     silent.execute(sendMessage);
                 })
