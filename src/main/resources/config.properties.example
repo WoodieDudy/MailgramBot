@@ -1,2 +1,3 @@
 bot.token = {your_bot_token}
 bot.name = {your_bot_name}
+webapp.url = {your_web_app_url}
