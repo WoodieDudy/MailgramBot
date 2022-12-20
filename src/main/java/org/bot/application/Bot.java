@@ -12,13 +12,11 @@ import org.bot.infrastructure.interfaces.MailInterface;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSerializable;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -34,10 +32,11 @@ import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 public final class Bot extends AbilityBot {
     private final UserRepository userRepository = new UserRepository();
     private final HashMap<String, Command> commands;
+    private final String WEBAPP_URL;
 
-    public Bot(MailInterface mailInterface, String BOT_TOKEN, String BOT_USERNAME) {
+    public Bot(MailInterface mailInterface, String BOT_TOKEN, String BOT_USERNAME, String WEBAPP_URL) {
         super(BOT_TOKEN, BOT_USERNAME);
-
+        this.WEBAPP_URL = WEBAPP_URL;
         this.commands = createCommands(mailInterface);
     }
 
@@ -62,53 +61,6 @@ public final class Bot extends AbilityBot {
     public long creatorId() {
         return 123456789;
     }
-
-//    @Override
-//    public void onUpdateReceived(Update update) {
-//        super.onUpdateReceived(update);
-//        // print webapp info
-//        System.out.println(update.getMessage().getWebAppData().getData());
-//
-//        if (!update.hasCallbackQuery()) {
-//            return;
-//        }
-//        User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
-//        System.out.println(update.getCallbackQuery().getData());
-//
-//        String callbackData = update.getCallbackQuery().getData();
-//        String[] callbackDataParts = callbackData.split(" ");
-//        String commandAlias = callbackDataParts[0];
-//        String fromMessageId = callbackDataParts[1];
-//        if (commandAlias.equals("letters")) {
-//            user.setTempEmail(callbackDataParts[2]);
-//
-//            List<InlineKeyboardButton> buttons = new ArrayList<>();
-//            for (int lettersNumber: new int[]{1, 2, 4}) {
-//                InlineKeyboardButton button = new InlineKeyboardButton(String.valueOf(lettersNumber));
-//                button.setCallbackData("chooseNum " + fromMessageId + " " + lettersNumber);
-//                buttons.add(button);
-//            }
-//
-//            System.out.println(fromMessageId);
-//
-//            org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
-//                    "Выберите количество писем",
-//                    Integer.parseInt(fromMessageId),
-//                    update.getCallbackQuery().getFrom().getId(),
-//                    buttons
-//            );
-//
-//            List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
-//
-//            for (BotApiMethodSerializable botApiMethodSerializable : executable) {
-//                silent.execute(botApiMethodSerializable);
-//            }
-//        }
-//        else if (commandAlias.equals("chooseNum")) {
-//            List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
-//            sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
-//        }
-//    }
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -244,8 +196,6 @@ public final class Bot extends AbilityBot {
                     for (BotApiMethodSerializable botApiMethodSerializable : executable) {
                         silent.execute(botApiMethodSerializable);
                     }
-
-//                    silent.send(commands.get(abilityName).execute(user,  ctx.arguments()).getText(), ctx.chatId());
                 })
                 .build();
     }
@@ -260,10 +210,9 @@ public final class Bot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     System.out.println(ctx.chatId());
-                    User user = userRepository.getUserById(ctx.chatId());
 
                     WebAppInfo webAppInfo = new WebAppInfo();
-                    webAppInfo.setUrl("https://228f-5-165-31-177.eu.ngrok.io");
+                    webAppInfo.setUrl(this.WEBAPP_URL);
 
                     ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
                     replyKeyboardMarkup.setSelective(true);
@@ -280,9 +229,9 @@ public final class Bot extends AbilityBot {
 
                     keyboard.add(keyboardFirstRow);
                     replyKeyboardMarkup.setKeyboard(keyboard);
-
                     SendMessage sendMessage = new SendMessage();
                     sendMessage.setChatId(ctx.chatId());
+                    sendMessage.setText("Use button below to sign in");
                     sendMessage.setReplyMarkup(replyKeyboardMarkup);
                     silent.execute(sendMessage);
                 })
