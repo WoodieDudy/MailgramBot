@@ -40,6 +40,7 @@ public class App {
             webAppUrl = properties.getProperty("webapp.url");
         }
         catch (IOException e) {
+            System.out.println("Error while reading config file");
             return;
         }
         Bot bot = new Bot(

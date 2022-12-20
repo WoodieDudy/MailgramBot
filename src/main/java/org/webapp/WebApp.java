@@ -24,7 +24,8 @@ public class WebApp {
     }
 
     static class HtmlHandler implements HttpHandler {
-        public void handle (HttpExchange t) throws IOException {
+        public void handle(HttpExchange t) throws IOException {
+            System.out.println(t.getRequestURI());
             String requestMethod = t.getRequestMethod();
             if (requestMethod.equalsIgnoreCase("GET")) {
                 String response = Files.readString(Paths.get("src/main/java/org/webapp/login_page.html"));

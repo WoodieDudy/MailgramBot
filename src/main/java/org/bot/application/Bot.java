@@ -69,8 +69,6 @@ public final class Bot extends AbilityBot {
 
         if (update.hasCallbackQuery()) {
             User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
-            System.out.println(update.getCallbackQuery().getData());
-
             String callbackData = update.getCallbackQuery().getData();
             String[] callbackDataParts = callbackData.split(" ");
             String commandAlias = callbackDataParts[0];
@@ -153,7 +151,6 @@ public final class Bot extends AbilityBot {
                 .locality(ALL)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    System.out.println(ctx.chatId());
                     User user = userRepository.getUserById(ctx.chatId());
                     SendChatAction sendChatAction = new SendChatAction(); // TODO move to BotInterface
                     sendChatAction.setChatId(ctx.chatId());
@@ -209,7 +206,7 @@ public final class Bot extends AbilityBot {
                 .locality(ALL)
                 .privacy(PUBLIC)
                 .action(ctx -> {
-                    System.out.println(ctx.chatId());
+                    System.out.println("Auth " + ctx.chatId());
 
                     WebAppInfo webAppInfo = new WebAppInfo();
                     webAppInfo.setUrl(this.WEBAPP_URL);
@@ -217,7 +214,7 @@ public final class Bot extends AbilityBot {
                     ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
                     replyKeyboardMarkup.setSelective(true);
                     replyKeyboardMarkup.setResizeKeyboard(true);
-                    replyKeyboardMarkup.setOneTimeKeyboard(false);
+                    replyKeyboardMarkup.setOneTimeKeyboard(true);
 
                     List<KeyboardRow> keyboard = new ArrayList<>();
 
