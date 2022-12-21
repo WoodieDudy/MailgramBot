@@ -87,7 +87,7 @@ public final class Bot extends AbilityBot {
                 System.out.println(fromMessageId);
 
                 org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
-                        "Выберите количество писем",
+                        MessagesTemplates.CHOOSE_NUMBER.text,
                         Integer.parseInt(fromMessageId),
                         update.getCallbackQuery().getFrom().getId(),
                         buttons
@@ -202,7 +202,7 @@ public final class Bot extends AbilityBot {
         return Ability
                 .builder()
                 .name(abilityName)
-                .info("Prints letters")
+                .info("Authenticate user")
                 .locality(ALL)
                 .privacy(PUBLIC)
                 .action(ctx -> {
@@ -220,7 +220,7 @@ public final class Bot extends AbilityBot {
 
                     KeyboardRow keyboardFirstRow = new KeyboardRow();
 
-                    KeyboardButton btn = new KeyboardButton("Sign in");
+                    KeyboardButton btn = new KeyboardButton("Авторизоваться");
                     btn.setWebApp(webAppInfo);
                     keyboardFirstRow.add(btn);
 
@@ -228,7 +228,7 @@ public final class Bot extends AbilityBot {
                     replyKeyboardMarkup.setKeyboard(keyboard);
                     SendMessage sendMessage = new SendMessage();
                     sendMessage.setChatId(ctx.chatId());
-                    sendMessage.setText("Use button below to sign in");
+                    sendMessage.setText(MessagesTemplates.AUTH_COMMAND_MESSAGE.text);
                     sendMessage.setReplyMarkup(replyKeyboardMarkup);
                     silent.execute(sendMessage);
                 })

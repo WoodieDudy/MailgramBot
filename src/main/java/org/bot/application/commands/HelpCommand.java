@@ -11,7 +11,7 @@ public class HelpCommand extends Command {
     public HelpCommand() {
         super(
             "help",
-            "- get help"
+            "- для получения справки по командам"
         );
     }
 

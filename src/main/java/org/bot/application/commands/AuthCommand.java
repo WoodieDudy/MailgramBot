@@ -31,7 +31,7 @@ public class AuthCommand extends Command {
     public AuthCommand(MailInterface mailInterface, Duration sessionDuration) {
         super(
                 "auth",
-                "<email> <password> - authenticate to mailbox"
+                "- для вызова кнопки со страницей авторизации"
         );
         this.mailInterface = mailInterface;
         this.sessionDuration = sessionDuration;
@@ -42,7 +42,7 @@ public class AuthCommand extends Command {
         try {
             parsedArgs = parseArgs(args);
         } catch (Exception e) {
-            return List.of(new Message(MessagesTemplates.AUTH_INCORRECT_MESSAGE.text, user.getId()));
+            return List.of(new Message(MessagesTemplates.AUTH_ERROR_MESSAGE.text, user.getId()));
         }
         Mailbox mailbox = new Mailbox(parsedArgs.email(), parsedArgs.password(), sessionDuration);
         if (this.mailInterface.isCredentialsCorrect(mailbox)) {

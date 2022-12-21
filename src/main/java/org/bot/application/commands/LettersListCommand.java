@@ -26,7 +26,7 @@ public class LettersListCommand extends Command {
     public LettersListCommand(MailInterface mailInterface) {
         super(
             "letters",
-            "<email> <n> - get n letters"
+            "- для вызова меню получения писем"
         );
         this.mailInterface = mailInterface;
     }
