@@ -11,14 +11,11 @@ import org.bot.infrastructure.TelegramBotInterface;
 import org.bot.infrastructure.interfaces.MailInterface;
 import org.telegram.abilitybots.api.bot.AbilityBot;
 import org.telegram.abilitybots.api.objects.Ability;
-import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSerializable;
-import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
@@ -65,32 +62,22 @@ public final class Bot extends AbilityBot {
     @Override
     public void onUpdateReceived(Update update) {
         super.onUpdateReceived(update);
-        // print webapp info
 
         if (update.hasCallbackQuery()) {
             User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
             String callbackData = update.getCallbackQuery().getData();
             String[] callbackDataParts = callbackData.split(" ");
             String commandAlias = callbackDataParts[0];
-            String fromMessageId = callbackDataParts[1];
+            String messageId = callbackDataParts[1];
 
             if (commandAlias.equals("letters")) {
                 user.setTempEmail(callbackDataParts[2]);
 
-                List<InlineKeyboardButton> buttons = new ArrayList<>();
-                for (int lettersNumber: new int[]{1, 2, 4}) {
-                    InlineKeyboardButton button = new InlineKeyboardButton(String.valueOf(lettersNumber));
-                    button.setCallbackData("chooseNum " + fromMessageId + " " + lettersNumber);
-                    buttons.add(button);
-                }
-
-                System.out.println(fromMessageId);
-
                 org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
                         MessagesTemplates.CHOOSE_NUMBER.text,
-                        Integer.parseInt(fromMessageId),
+                        Integer.parseInt(messageId),
                         update.getCallbackQuery().getFrom().getId(),
-                        buttons
+                        TelegramBotInterface.numberOfLetters(messageId)
                 );
 
                 List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
@@ -152,43 +139,21 @@ public final class Bot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     User user = userRepository.getUserById(ctx.chatId());
-                    SendChatAction sendChatAction = new SendChatAction(); // TODO move to BotInterface
-                    sendChatAction.setChatId(ctx.chatId());
-                    sendChatAction.setAction(ActionType.TYPING);
                     List<String> emails = user.getAllEmails();
-                    if (emails.isEmpty()) {
-                        silent.send(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, ctx.chatId());
-                        return;
-                    }
-                    org.bot.domain.Message message = new org.bot.domain.Message(
-                        MessagesTemplates.CHOOSE_EMAIL.text,
-                        ctx.chatId()
-                    );
 
-                    SendMessage messageToSend = TelegramBotInterface.sendMessage(message);
-
-                    Optional<Message> sentMessage = silent.execute(messageToSend);
+                    Optional<Message> sentMessage = silent.execute(
+                            TelegramBotInterface.lettersAliasEmailWithoutKeyboard(user, emails));
 
                     if (sentMessage.isEmpty()) {
                         System.out.println("Message is empty");
                         return;
                     }
-                    Integer sentMessageId = sentMessage.get().getMessageId();
 
-                    List<InlineKeyboardButton> buttons = new ArrayList<>();
-                    for (String email : emails) {
-                        InlineKeyboardButton button = new InlineKeyboardButton(email);
-                        button.setCallbackData("letters " + sentMessageId + " " + email);
-                        buttons.add(button);
-                    }
-
-                    org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
-                        sentMessageId,
-                        ctx.chatId(),
-                        buttons
+                    List<BotApiMethodSerializable> executable = TelegramBotInterface.lettersAliasEmailWithKeyboard(
+                            user,
+                            emails,
+                            sentMessage
                     );
-
-                    List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
 
                     for (BotApiMethodSerializable botApiMethodSerializable : executable) {
                         silent.execute(botApiMethodSerializable);
