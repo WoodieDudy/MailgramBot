@@ -114,10 +114,10 @@ public class Letter {
     public String asString(int maxLen) {
         String letterStr = MessageFormat.format(
                 """
-                        Sender: {0}
-                        Subject: {1}
-                        Date: {2}
-                                    
+                        Отправитель: {0}
+                        Тема: {1}
+                        Дата: {2}
+                                            
                         {3}""",
                 sender, subject, date, body
         );
@@ -127,9 +127,9 @@ public class Letter {
     public String asString() {
         return MessageFormat.format(
                 """
-                        Sender: {0}
-                        Subject: {1}
-                        Date: {2}
+                        Отправитель: {0}
+                        Тема: {1}
+                        Дата: {2}
                                             
                         {3}""",
                 sender, subject, date, body

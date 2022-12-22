@@ -15,7 +15,10 @@ import org.telegram.telegrambots.meta.api.methods.botapimethods.BotApiMethodSeri
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 
 import java.time.Duration;
 import java.util.*;
@@ -26,19 +29,20 @@ import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
 public final class Bot extends AbilityBot {
     private final UserRepository userRepository = new UserRepository();
     private final HashMap<String, Command> commands;
+    private final String WEBAPP_URL;
 
-    public Bot(MailInterface mailInterface, String BOT_TOKEN, String BOT_USERNAME) {
+    public Bot(MailInterface mailInterface, String BOT_TOKEN, String BOT_USERNAME, String WEBAPP_URL) {
         super(BOT_TOKEN, BOT_USERNAME);
-
+        this.WEBAPP_URL = WEBAPP_URL;
         this.commands = createCommands(mailInterface);
     }
 
     private static HashMap<String, Command> createCommands(MailInterface mailInterface) {
         HelpCommand helpCommand = new HelpCommand();
         Command[] commands = {
-                new AuthCommand(mailInterface, Duration.ofDays(1)),
-                new LettersListCommand(mailInterface),
-                helpCommand
+            new AuthCommand(mailInterface, Duration.ofDays(1)),
+            new LettersListCommand(mailInterface),
+            helpCommand
         };
 
         HashMap<String, Command> commandHashMap = new HashMap<>();
@@ -58,40 +62,44 @@ public final class Bot extends AbilityBot {
     @Override
     public void onUpdateReceived(Update update) {
         super.onUpdateReceived(update);
-        if (!update.hasCallbackQuery()) {
-            return;
+
+        if (update.hasCallbackQuery()) {
+            User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
+            String callbackData = update.getCallbackQuery().getData();
+            String[] callbackDataParts = callbackData.split(" ");
+            String commandAlias = callbackDataParts[0];
+            String messageId = callbackDataParts[1];
+
+            if (commandAlias.equals("letters")) {
+                user.setTempEmail(callbackDataParts[2]);
+
+                org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
+                        MessagesTemplates.CHOOSE_NUMBER.text,
+                        Integer.parseInt(messageId),
+                        update.getCallbackQuery().getFrom().getId(),
+                        TelegramBotInterface.numberOfLetters(messageId)
+                );
+
+                List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
+
+                for (BotApiMethodSerializable botApiMethodSerializable : executable) {
+                    silent.execute(botApiMethodSerializable);
+                }
+            }
+            else if (commandAlias.equals("chooseNum")) {
+                List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
+                sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
+            }
         }
-        User user = userRepository.getUserById(update.getCallbackQuery().getFrom().getId());
 
-        String callbackData = update.getCallbackQuery().getData();
-        String[] callbackDataParts = callbackData.split(" ");
-        String commandAlias = callbackDataParts[0];
-        String fromMessageId = callbackDataParts[1];
-        if (commandAlias.equals("letters")) {
-            user.setTempEmail(callbackDataParts[2]);
+        if (update.getMessage().getWebAppData() != null) {
+            User user = userRepository.getUserById(update.getMessage().getChatId());
 
-            List<InlineKeyboardButton> buttons = new ArrayList<>();
-            for (int lettersNumber : new int[]{1, 2, 4}) {
-                InlineKeyboardButton button = new InlineKeyboardButton(String.valueOf(lettersNumber));
-                button.setCallbackData("chooseNum " + fromMessageId + " " + lettersNumber);
-                buttons.add(button);
-            }
-
-            org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
-                    "Выберите количество писем",
-                    Integer.parseInt(fromMessageId),
-                    update.getCallbackQuery().getFrom().getId(),
-                    buttons
-            );
-
-            List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
-
-            for (BotApiMethodSerializable botApiMethodSerializable : executable) {
-                silent.execute(botApiMethodSerializable);
-            }
-        } else if (commandAlias.equals("chooseNum")) {
-            List<String> args = Arrays.asList(user.getTempEmail(), callbackDataParts[2]);
-            sendAll(commands.get("letters").execute(user, args), update.getCallbackQuery().getFrom().getId());
+            String callbackData = update.getMessage().getWebAppData().getData();
+            String[] callbackDataParts = callbackData.split(" ");
+            String email = callbackDataParts[0];
+            String password = callbackDataParts[1];
+            sendAll(commands.get("auth").execute(user, List.of(email, password)), user.getId());
         }
     }
 
@@ -121,21 +129,6 @@ public final class Bot extends AbilityBot {
                 .build();
     }
 
-    public Ability auth() {
-        String abilityName = "auth";
-        return Ability
-                .builder()
-                .name(abilityName)
-                .info("Auth user")
-                .locality(ALL)
-                .privacy(PUBLIC)
-                .action(ctx -> {
-                    User user = userRepository.getUserById(ctx.chatId());
-                    sendAll(commands.get(abilityName).execute(user, List.of(ctx.arguments())), ctx.chatId());
-                })
-                .build();
-    }
-
     public Ability letters() {
         String abilityName = "letters";
         return Ability
@@ -146,45 +139,63 @@ public final class Bot extends AbilityBot {
                 .privacy(PUBLIC)
                 .action(ctx -> {
                     User user = userRepository.getUserById(ctx.chatId());
-                    TelegramBotInterface.setBotAction(ctx.chatId());
                     List<String> emails = user.getAllEmails();
-                    if (emails.isEmpty()) {
-                        silent.send(MessagesTemplates.NOT_AUTH_LIST_IS_UNAVAILABLE.text, ctx.chatId());
-                        return;
-                    }
-                    org.bot.domain.Message message = new org.bot.domain.Message(
-                            MessagesTemplates.CHOOSE_EMAIL.text,
-                            ctx.chatId()
-                    );
 
-                    SendMessage messageToSend = TelegramBotInterface.sendMessage(message);
-
-                    Optional<Message> sentMessage = silent.execute(messageToSend);
+                    Optional<Message> sentMessage = silent.execute(
+                            TelegramBotInterface.lettersAliasEmailWithoutKeyboard(user, emails));
 
                     if (sentMessage.isEmpty()) {
                         System.out.println("Message is empty");
                         return;
                     }
-                    Integer sentMessageId = sentMessage.get().getMessageId();
 
-                    List<InlineKeyboardButton> buttons = new ArrayList<>();
-                    for (String email : emails) {
-                        InlineKeyboardButton button = new InlineKeyboardButton(email);
-                        button.setCallbackData("letters " + sentMessageId + " " + email);
-                        buttons.add(button);
-                    }
-
-                    org.bot.domain.Message messageToEdit = new org.bot.domain.Message(
-                            sentMessageId,
-                            ctx.chatId(),
-                            buttons
+                    List<BotApiMethodSerializable> executable = TelegramBotInterface.lettersAliasEmailWithKeyboard(
+                            user,
+                            emails,
+                            sentMessage
                     );
-
-                    List<BotApiMethodSerializable> executable = TelegramBotInterface.editMessage(messageToEdit);
 
                     for (BotApiMethodSerializable botApiMethodSerializable : executable) {
                         silent.execute(botApiMethodSerializable);
                     }
+                })
+                .build();
+    }
+
+    public Ability auth() {
+        String abilityName = "auth";
+        return Ability
+                .builder()
+                .name(abilityName)
+                .info("Authenticate user")
+                .locality(ALL)
+                .privacy(PUBLIC)
+                .action(ctx -> {
+                    System.out.println("Auth " + ctx.chatId());
+
+                    WebAppInfo webAppInfo = new WebAppInfo();
+                    webAppInfo.setUrl(this.WEBAPP_URL);
+
+                    ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+                    replyKeyboardMarkup.setSelective(true);
+                    replyKeyboardMarkup.setResizeKeyboard(true);
+                    replyKeyboardMarkup.setOneTimeKeyboard(true);
+
+                    List<KeyboardRow> keyboard = new ArrayList<>();
+
+                    KeyboardRow keyboardFirstRow = new KeyboardRow();
+
+                    KeyboardButton btn = new KeyboardButton("Авторизоваться");
+                    btn.setWebApp(webAppInfo);
+                    keyboardFirstRow.add(btn);
+
+                    keyboard.add(keyboardFirstRow);
+                    replyKeyboardMarkup.setKeyboard(keyboard);
+                    SendMessage sendMessage = new SendMessage();
+                    sendMessage.setChatId(ctx.chatId());
+                    sendMessage.setText(MessagesTemplates.AUTH_COMMAND_MESSAGE.text);
+                    sendMessage.setReplyMarkup(replyKeyboardMarkup);
+                    silent.execute(sendMessage);
                 })
                 .build();
     }

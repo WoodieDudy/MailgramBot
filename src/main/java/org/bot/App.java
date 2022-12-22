@@ -13,16 +13,41 @@ import java.util.Properties;
 
 
 public class App {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        String configPath = args[0];
+        new Thread(new Runnable() {
+            public void run() {
+                startWebApp(11111);
+            }
+        }).start();
+        new Thread(new Runnable() {
+            public void run() {
+                startBot(configPath);
+            }
+        }).start();
+    }
+
+    private static void startBot(String configPath) {
         MailInterface mailInterface = new JakartaMailInterface();
 
-        // src/main/resources/config.properties
-        Properties properties = PropertyParser.parseProperties(args[0]);
-
+        String token;
+        String name;
+        String webAppUrl;
+        try {
+            Properties properties = PropertyParser.parseProperties(configPath);
+            token = properties.getProperty("bot.token");
+            name = properties.getProperty("bot.name");
+            webAppUrl = properties.getProperty("webapp.url");
+        }
+        catch (IOException e) {
+            System.out.println("Error while reading config file");
+            return;
+        }
         Bot bot = new Bot(
             mailInterface,
-            properties.getProperty("bot.token"),
-            properties.getProperty("bot.name")
+            token,
+            name,
+            webAppUrl
         );
         try {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
@@ -30,5 +55,9 @@ public class App {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void startWebApp(int port) {
+        org.webapp.WebApp.startHost(port);
     }
 }
